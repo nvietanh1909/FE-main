@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import UET from '@/assets/images/UET.svg';
 import { getUser, logout } from "@/services/AuthService.ts";
 
@@ -12,12 +12,12 @@ export default function Header() {
     };
 
     return (
-        <header className="bg-white shadow-sm border-b">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <header className="bg-white shadow-sm border-b h-[5.3rem] flex items-center justify-center">
+            <div className="mx-auto px-4 sm:px-6 lg:px-8 w-full">
                 <div className="flex justify-between items-center h-16">
-                    <div className="flex items-center">
+                    <Link to="/" className="flex items-center">
                         <img src={UET} alt="UET Logo" />
-                    </div>
+                    </Link>
                     
                     <div className="flex items-center space-x-4">
                         <div className="text-sm text-gray-700">
