@@ -36,8 +36,6 @@ npm run preview
 ```
 ## 2. Cấu trúc thư mục
 
-```
-
 - **Cài đặt dependencies:**
   ```bash
   npm install
