@@ -28,7 +28,7 @@ export default function LoginForm() {
     useEffect(() => {
         const isAuthenticated = sessionStorage.getItem('token') === 'true';
         if (isAuthenticated) {
-            navigate('/dashboard', { replace: true });
+            navigate('/', { replace: true });
         }
     }, []);
 
@@ -44,7 +44,7 @@ export default function LoginForm() {
                 sessionStorage.setItem('user', JSON.stringify({ name: "test" }));
                 sessionStorage.setItem('token', 'true');
                 sessionStorage.setItem('isRemember', isRemember.toString());
-                navigate("/dashboard");
+                navigate("/");
             } else {
                 setError("Email hoặc mật khẩu không chính xác");
                 nprogress.done();
