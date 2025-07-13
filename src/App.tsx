@@ -8,13 +8,16 @@ import '@/assets/styles/root.css'
 import RegisterPage from '@/features/auth/pages/RegisterPage.tsx'
 import PublicRoute from '@/routes/PublicRoute.tsx'
 import NotFoundPage from '@/routes/NotFoundRoute.tsx'
+import ProcedurePage from '@/features/procedure/pages/ProcedurePage.tsx'
+import MessagePage from '@/features/message/pages/MessagePage.tsx'
+import SettingPage from '@/features/setting/pages/SettingPage.tsx'
 
 function App() {
   return (
     <Router>
       <Routes>
 
-        // Public routes: Login, Register
+        {/* Public routes: Login, Register */}
         <Route path="/login" element={
           <PublicRoute>
             <LoginPage />
@@ -28,18 +31,21 @@ function App() {
         } />
 
 
-        // Protected routes: Dashboard
-        <Route path="/dashboard" element={
+        {/* Protected routes: Dashboard */}
+        <Route path="/" element={
           <ProtectedRoute>
             <UserLayout />
           </ProtectedRoute>
         }>
           <Route index element={<DashboardPage />} />
+          <Route path="procedures" element={<ProcedurePage />} />
+          <Route path="messages" element={<MessagePage />} />
+          <Route path="settings" element={<SettingPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
 
 
-        // Redirect to login if routes are not exist
+        {/* Redirect to login if routes are not exist */}
         <Route path="*" element={<Navigate to="/login" replace />} />
 
       </Routes>
