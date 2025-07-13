@@ -34,7 +34,7 @@ Chạy thử bản build production trên local:
 ```bash
 npm run preview
 ```
-## 2. Cấu trúc thư mục
+## 2. Các lệnh npm khác
 
 - **Cài đặt dependencies:**
   ```bash
