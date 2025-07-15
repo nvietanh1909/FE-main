@@ -9,6 +9,7 @@ import TextField from '@mui/material/TextField';
 import Button from "@mui/material/Button";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from '@mui/material/FormControlLabel';
+import { SwitchIOS } from "@/components/switch/SwitchIOS.tsx";
 
 
 type LoginFormInput = {
@@ -62,10 +63,10 @@ export default function LoginForm() {
         <div className="w-full max-w-[428px] mx-auto bg-white rounded-2xl p-4 sm:p-8 flex flex-col items-center">
             
             <div className="w-full flex flex-col items-start mb-6">
-                    <img src={UET} alt="UET Logo"/>
+                    <img src={UET} alt="UET Logo" className="w-[7rem]"/>
                 </div>
                 
-            <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col gap-2 mt-[20px]">
+            <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col gap-3 mt-[20px]">
                 <div className="flex flex-col gap-5">
                     <div className="flex flex-col gap-2 placeholder-[#717A84]">
                         <TextField 
@@ -74,6 +75,15 @@ export default function LoginForm() {
                             placeholder="Nhập email của bạn"
                             variant="outlined"
                             size="medium"
+                            sx={{
+                                '& .MuiInputBase-input': {
+                                    fontFamily: 'Roboto, Arial, sans-serif',
+                                },
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: '10px',
+                                    fontSize: '16px',
+                                },
+                            }}
                             fullWidth
                             {...register('email', { required: 'Vui lòng nhập email' })}
                             error={!!errors.email}
@@ -89,6 +99,15 @@ export default function LoginForm() {
                                 variant="outlined"
                                 size="medium"
                                 type="password"
+                                sx={{
+                                    '& .MuiInputBase-input': {
+                                        fontFamily: 'Roboto, Arial, sans-serif',
+                                    },
+                                    '& .MuiOutlinedInput-root': {
+                                        borderRadius: '10px',
+                                        fontSize: '16px',
+                                    },
+                                }}
                                 fullWidth
                                 {...register('password', { required: 'Vui lòng nhập mật khẩu' })}
                                 error={!!errors.password}
@@ -100,12 +119,15 @@ export default function LoginForm() {
                     {error && <p className="text-red-500 mt-0 mb-2 font-size-[15px]">{error}</p>}
                 </div>
 
-                <div className="flex items-center justify-between mt-1 mb-2">
-                    <FormControlLabel
-                        control={<Switch color="primary" checked = {isRemember} onChange={() => setIsRemember(!isRemember)} />}
-                        label={<span className="text-sm color-[#717A84]">Ghi nhớ đăng nhập</span>}
-                        className="m-0"
-                    />
+                <div className="flex items-center justify-between  mt-1 mb-2">
+                    <div className="flex items-center gap-2">
+                        <SwitchIOS 
+                            color="primary" 
+                            checked={isRemember} 
+                            onChange={() => setIsRemember(!isRemember)} 
+                        />
+                        <span className="text-sm text-[#717A84]">Ghi nhớ đăng nhập</span>
+                    </div>
                     <a href="#" className="text-sm text-[#0056b3] hover:underline decoration-none">Quên mật khẩu</a>
                 </div>
 
@@ -113,6 +135,11 @@ export default function LoginForm() {
                     variant="contained" 
                     type="submit" 
                     fullWidth
+                    sx={{
+                        '& .MuiButton-root': {
+                            fontFamily: 'Roboto, Arial, sans-serif',
+                        },
+                    }}
                     className="!bg-[#0080ff] !text-white !font-bold !text-lg !py-3 rounded-lg mt-2"
                 >
                     Đăng nhập
