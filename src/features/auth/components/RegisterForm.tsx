@@ -50,9 +50,9 @@ export default function RegisterForm() {
     return (
         <div className="w-full max-w-[428px] mx-auto bg-white rounded-2xl p-4 sm:p-8 flex flex-col items-center">
             <div className="w-full flex flex-col items-start mb-6">
-                <img src={UET} alt="UET Logo" className="h-10 w-auto mb-2" />
+                <img src={UET} alt="UET Logo" className="w-[7rem]"/>
             </div>
-            <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col gap-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col gap-3">
                 <div className="flex flex-col gap-2">
                     <TextField
                         id="email"
@@ -60,6 +60,15 @@ export default function RegisterForm() {
                         placeholder="Nhập email của bạn"
                         variant="outlined"
                         size="medium"
+                        sx={{
+                            '& .MuiInputBase-input': {
+                                fontFamily: 'Roboto, Arial, sans-serif',
+                            },
+                            '& .MuiOutlinedInput-root': {
+                                borderRadius: '10px',
+                                fontSize: '16px',
+                            },
+                        }}
                         fullWidth
                         {...register('email', { required: 'Vui lòng nhập email' })}
                         error={!!errors.email}
@@ -76,6 +85,12 @@ export default function RegisterForm() {
                             value={org}
                             {...register('organization', { required: 'Vui lòng chọn khoa' })}
                             onChange={e => setOrg(e.target.value)}
+                            sx={{
+                                borderRadius: '10px',
+                                '& .MuiOutlinedInput-notchedOutline': {
+                                    borderRadius: '10px',
+                                },
+                            }}
                         >
                             <MenuItem value="none">Không có</MenuItem>
                             <MenuItem value="uet">Khoa Công nghệ thông tin</MenuItem>
@@ -92,6 +107,15 @@ export default function RegisterForm() {
                         label="Mật khẩu"
                         variant="outlined"
                         size="medium"
+                        sx={{
+                            '& .MuiInputBase-input': {
+                                fontFamily: 'Roboto, Arial, sans-serif',
+                            },
+                            '& .MuiOutlinedInput-root': {
+                                borderRadius: '10px',
+                                fontSize: '16px',
+                            },
+                        }}
                         type="password"
                         fullWidth
                         {...register('password', { required: 'Vui lòng nhập mật khẩu' })}
@@ -115,7 +139,7 @@ export default function RegisterForm() {
                                         ? "warning"
                                         : "success"
                         }
-                        className="mt-1 h-2 rounded"
+                        className="mt-1 h-2 rounded py-[1px] color-blueGray"
                     />
                     <div className={`text-sm mt-1 ${
                         passwordStrength <= 1 ? 'text-red-500' : passwordStrength === 2 ? 'text-yellow-500' : 'text-green-600'
