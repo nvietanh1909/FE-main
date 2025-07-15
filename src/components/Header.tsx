@@ -55,7 +55,6 @@ export default function Header() {
                                     sx={{
                                         bgcolor: deepPurple[500],
                                         cursor: 'pointer',
-                                        border: '2px solid #2563eb',
                                         transition: 'transform 0.15s',
                                         fontFamily: 'Roboto, Arial, sans-serif',
                                         '&:hover': { transform: 'scale(1.08)' }
