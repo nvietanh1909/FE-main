@@ -6,7 +6,8 @@ import Avatar from "@mui/material/Avatar";
 import { deepPurple } from "@mui/material/colors";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import LogoutIcon from '@mui/icons-material/Logout';
+// @ts-ignore
+//import LogoutIcon from '@mui/icons-material/Logout';
 
 export default function Header() {
     const navigate = useNavigate();
@@ -88,7 +89,7 @@ export default function Header() {
                                         className="text-red-600 font-semibold hover:bg-red-50 gap-2 px-4 py-2 rounded-lg transition-colors"
                                         sx={{ fontFamily: 'Roboto, Arial, sans-serif', fontWeight: 500 }}
                                     >
-                                        <LogoutIcon fontSize="small" className="text-red-500" />
+                                        {/*<LogoutIcon fontSize="small" className="text-red-500" />*/}
                                         Đăng xuất
                                     </MenuItem>
                                 </Menu>
