@@ -35,7 +35,10 @@ export default function SideBar() {
     <aside className="w-80 min-h-screen flex flex-col justify-between bg-[#F1F7FF] border-r border-gray-200">
       <nav className="flex flex-col gap-4 mt-[1rem]">
         {menu.map((item) => {
-          const isActive = location.pathname === item.to;
+          const isActive =
+          item.to === '/'
+            ? location.pathname === '/'
+            : location.pathname.startsWith(item.to);
           return (
             <Link
               to={item.to}

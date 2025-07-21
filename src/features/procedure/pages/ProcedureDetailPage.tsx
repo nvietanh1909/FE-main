@@ -36,7 +36,7 @@ export default function ProcedureDetailPage() {
   return (
     <div className="py-4 px-6">
       <Breadcrumbs separator=">" aria-label="breadcrumb" className="text-base mb-4">
-        <Link underline="none" color="inherit" href="/dashboard" className="flex items-center gap-1">
+        <Link underline="none" color="inherit" href="/" className="flex items-center gap-1">
           <FaHome className="text-lg" />
           <span>Trang chủ</span>
         </Link>

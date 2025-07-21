@@ -73,7 +73,7 @@ export default function DashboardPage() {
         <Link
           underline="none"
           color="inherit"
-          href="/dashboard"
+          href="/"
           className="flex items-center gap-1"
         >
           <FaHome className="text-lg" />
