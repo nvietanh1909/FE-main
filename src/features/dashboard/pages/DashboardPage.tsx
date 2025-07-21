@@ -4,14 +4,18 @@ import Typography from '@mui/material/Typography';
 import { FaHome } from 'react-icons/fa';
 import nprogress from 'nprogress';
 import 'nprogress/nprogress.css';
-import { Grid, Box, Link, Button, InputBase, Paper } from '@mui/material';
-import StatsCard from '@/components/StatsCard.tsx';
-import { CheckCircle, Menu, Search } from '@mui/icons-material';
+import { Box, Link, Button, InputBase, Grid } from '@mui/material';
+import StatsCard from '@/features/dashboard/components/StatsCard.tsx';
+import { Check, CheckCircle, Menu, Search } from '@mui/icons-material';
 import FlashOnIcon from '@mui/icons-material/FlashOn';
 import StarIcon from '@mui/icons-material/Star';
-import Welcome from "../../../components/Welcome.tsx";
-import ProcedureCard from '@/components/ProcedureCard.tsx';
-import Progress from '@/components/Progress.tsx';
+import Welcome from "../components/Welcome.tsx";
+import ProcedureCard from '@/features/dashboard/components/ProcedureCard.tsx';
+import Progress from '@/features/dashboard/components/Progress.tsx';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import { useState } from 'react';
+
 
 export default function DashboardPage() {
   nprogress.configure({ showSpinner: false });
@@ -23,7 +27,7 @@ export default function DashboardPage() {
 
   const statsCardData = [
     {
-      icon: <CheckCircle sx={{ color: 'green' }} />,
+      icon: <Check sx={{ color: '#008000' }} />,
       title: 'Số thủ tục đã xong',
       count: 12,
       subText: '+2 thủ tục tuần này',
@@ -35,7 +39,7 @@ export default function DashboardPage() {
       subText: '+2 thủ tục tuần này',
     },
     {
-      icon: <StarIcon sx={{ color: '#f5c518' }} />,
+      icon: <StarIcon sx={{ color: '#FFDD64' }} />,
       title: 'Số lượng câu hỏi',
       count: 24,
       subText: '+2 câu hỏi tuần này',
@@ -60,8 +64,11 @@ export default function DashboardPage() {
     },
   ];
 
+  const [searchTab, setSearchTab] = useState(0);
+  const [searchMode, setSearchMode] = useState(0); // 0: thường, 1: thông minh
+
   return (
-    <div className="p-4">
+    <div className="py-4 px-6">
       <Breadcrumbs separator=">" aria-label="breadcrumb" className="text-base mb-4">
         <Link
           underline="none"
@@ -79,11 +86,11 @@ export default function DashboardPage() {
 
 
       {/* Phần nội dung dashboard */}
-      <div>
+      <div className="flex flex-col gap-4">
         <Welcome name="An" notificationCount={1} />
         <Grid container spacing={3}>
           {statsCardData.map((card, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
+            <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
               <StatsCard
                 icon={card.icon}
                 title={card.title}
@@ -93,77 +100,161 @@ export default function DashboardPage() {
             </Grid>
           ))}
         </Grid>
-        <Box>
-          <Box sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
+        <Box sx={{ mt: 2, background: '#fff', borderRadius: 4, boxShadow: '0px 4px 12px rgba(0,0,0,0.1), 0px 2px 4px rgba(0,0,0,0.08)', p: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box>
-              <Typography variant="h6" fontWeight={600} mt={4}>
+              <Typography variant="h5" fontWeight={600}>
                 Tra cứu tìm kiếm thủ tục
               </Typography>
-              <Typography variant="body2" color="text.secondary" mb={2}>
+              <Typography variant="body2" color="text.secondary" mb={2} sx={{ fontFamily: 'Roboto, sans-serif, arial', fontSize: '0.9rem' }}>
                 Tìm kiếm thông tin với UET AIA
               </Typography>
             </Box>
             <Link href="/procedures" style={{ textDecoration: 'none', color: '#2563eb' }}>
-              Xem tất cả  {'>'}
+              Xem tất cả 
             </Link>
           </Box>
-          <Box sx={{ display: 'flex' }}>
-            <Button variant="outlined" startIcon={<Menu />} autoCapitalize='none' sx={{ mt: 2 }}>
-              Tất cả danh mục
-            </Button>
-            <Button
-              component="form"
-              startIcon={<Search />}
-              sx={{ display: 'flex', alignItems: 'center', mt: 2, }}
-            >
-              <InputBase
-                placeholder="Tìm kiếm"
-                inputProps={{ 'aria-label': 'search google maps' }}
-              />
-            </Button>
-          </Box>
+          <Tabs
+            value={searchTab}
+            onChange={(_, v) => setSearchTab(v)}
+            sx={{ minHeight: 0, mb: 2, mt: 2 }}
+            TabIndicatorProps={{ style: { background: '#2563eb', height: 3, borderRadius: 2 } }}
+          >
+            <Tab
+              label={<Box sx={{ display: 'flex', alignItems: 'center', gap: 1, fontSize: '0.95rem', fontFamily: 'Roboto, sans-serif, arial' }}><Menu sx={{ fontSize: '1.2rem' }} /> Tất cả danh mục</Box>}
+              sx={{
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: 14,
+                minHeight: 0,
+                px: 2.2,
+                py: 1.1,
+                color: searchTab === 0 ? '#2563eb' : '#6b7280',
+                background: searchTab === 0 ? '#e8f0fe' : '#F3F4F6',
+                borderRadius: 1.5,
+                mr: 1,
+                boxShadow: 'none',
+              }}
+            />
+            <Tab
+              label={<Box sx={{ display: 'flex', alignItems: 'center', gap: 1, fontSize: '0.95rem', fontFamily: 'Roboto, sans-serif, arial' }}><Search /> Tìm kiếm</Box>}
+              sx={{
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: 14,
+                minHeight: 0,
+                px: 2.2,
+                py: 1.1,
+                color: searchTab === 1 ? '#2563eb' : '#6b7280',
+                background: searchTab === 1 ? '#e8f0fe' : '#F3F4F6',
+                borderRadius: 1.5,
+                boxShadow: 'none',
+              }}
+            />
+          </Tabs>
+          {searchTab === 0 && (
+            <Box sx={{ mt: 2 }}>
+              <Typography variant="h6" fontWeight={600} mb={2}>
+                Danh mục thủ tục
+              </Typography>
+              <Box sx={{ mt: 2 }}>
+                {procedures.map((proc, index) => (
+                  <ProcedureCard
+                    key={index}
+                    title={proc.title}
+                    description={proc.description}
+                    date={proc.date}
+                    onClick={() => console.log(`Clicked on ${proc.title}`)}
+                  />
+                ))}
+              </Box>
+            </Box>
+          )}
+          {searchTab === 1 && (
+            <Box sx={{ mx: 'auto', background: '#fff', borderRadius: 3, boxShadow: '0 2px 12px 0 rgba(0,0,0,0.08)', p: 3, mt: 2 }}>
+              <Typography variant="h5" fontWeight={700} align="center" mb={1}>
+                Tìm kiếm tài liệu
+              </Typography>
+              <Typography variant="body2" color="text.secondary" align="center" mb={2}>
+                Sử dụng tìm kiếm thông thường hoặc tìm kiếm thông minh
+              </Typography>
+              <Box sx={{ display: 'flex', background: '#F3F4F6', borderRadius: 1.2, mb: 2, overflow: 'hidden' }}>
+                <Button
+                  startIcon={<Search />}
+                  onClick={() => setSearchMode(0)}
+                  sx={{
+                    flex: 1,
+                    background: searchMode === 0 ? '#2563eb' : '#f5f6fa',
+                    color: searchMode === 0 ? '#fff' : '#222',
+                    fontWeight: 600,
+                    borderRadius: 0,
+                    boxShadow: 'none',
+                    textTransform: 'none',
+                    fontSize: 14,
+                    px: 1.5,
+                    py: 1,
+                    '&:hover': { background: searchMode === 0 ? '#2563eb' : '#e5e7eb' },
+                  }}
+                >
+                  Tìm kiếm thông thường
+                </Button>
+                <Button
+                  startIcon={<FlashOnIcon />}
+                  onClick={() => setSearchMode(1)}
+                  sx={{
+                    flex: 1,
+                    background: searchMode === 1 ? '#2563eb' : '#f5f6fa',
+                    color: searchMode === 1 ? '#fff' : '#222',
+                    fontWeight: 600,
+                    borderRadius: 0,
+                    boxShadow: 'none',
+                    textTransform: 'none',
+                    fontSize: 14,
+                    px: 1.5,
+                    py: 1,
+                    '&:hover': { background: searchMode === 1 ? '#2563eb' : '#e5e7eb' },
+                  }}
+                >
+                  Tìm kiếm thông minh
+                </Button>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, background: '#fff', borderRadius: 2, border: '1px solid #E5E7EB', px: 1, py: 0.5 }}>
+                <InputBase
+                  placeholder="Mô tả nội dung bạn cần tìm"
+                  sx={{
+                    flex: 1,
+                    fontSize: 16,
+                    px: 1,
+                    py: 0.5,
+                  }}
+                  inputProps={{ 'aria-label': 'search input' }}
+                />
+                <Button variant="contained" sx={{ minWidth: 40, minHeight: 40, borderRadius: 2, background: '#2563eb', p: 0 }}>
+                  <Search sx={{ color: '#fff' }} />
+                </Button>
+              </Box>
+            </Box>
+          )}
         </Box>
-        <Box>
-          <Typography variant="h6" fontWeight={600} mt={4}>
-            Danh mục thủ tục
-          </Typography>
-          <Box sx={{ mt: 2 }}>
-            {procedures.map((proc, index) => (
-              <ProcedureCard
-                key={index}
-                title={proc.title}
-                description={proc.description}
-                date={proc.date}
-                onClick={() => console.log(`Clicked on ${proc.title}`)}
-              />
-            ))}
+        <Box sx={{ mt: 2, background: '#fff', borderRadius: 4, boxShadow: '0px 4px 12px rgba(0,0,0,0.1), 0px 2px 4px rgba(0,0,0,0.08)', p: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box>
+              <Typography variant="h5" fontWeight={600} sx={{ fontFamily: 'Roboto, sans-serif, arial' }}>
+                Lịch sử thủ tục
+              </Typography>
+              <Typography variant="body2" color="text.secondary" mb={2} sx={{ fontFamily: 'Roboto, sans-serif, arial', fontSize: '1rem' }}>
+                Danh sách thủ tục của bạn đã tra cứu
+              </Typography>
+            </Box>
+            <Link href="/procedures" style={{ textDecoration: 'none', color: '#2563eb' }}>
+              Xem tất cả
+            </Link>
+          </Box>
+          <Box sx={{ width: '100%', maxWidth: '100%' }}>
+            <Progress />
           </Box>
         </Box>
       </div>
-      <Box sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
-        <Box>
-          <Typography variant="h6" fontWeight={600} mt={4}>
-            Lich sử thủ tục
-          </Typography>
-          <Typography variant="body2" color="text.secondary" mb={2}>
-            Danh sách thủ tục của bạn đã tra cứu
-          </Typography>
-        </Box>
-        <Link href="/procedures" style={{ textDecoration: 'none', color: '#2563eb' }}>
-          Xem tất cả  {'>'}
-        </Link>
-      </Box>
-      <Box>
-        <Progress />
-      </Box>
     </div>
   );
 }

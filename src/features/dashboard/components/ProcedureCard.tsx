@@ -26,6 +26,10 @@ export default function ProcedureCard({
         backgroundColor: '#f8fbff',
         borderLeft: '4px solid #2962ff',
         mb: 2,
+        transition: 'background 0.18s',
+        '&:hover': {
+          backgroundColor: '#f3f4f6',
+        },
       }}
     >
       <Box>

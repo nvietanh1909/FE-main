@@ -14,7 +14,7 @@ export default function SettingPage() {
     nprogress.done();
   }, []);
   return (
-    <div className="p-4">
+    <div className="py-4 px-6">
       <Breadcrumbs separator=">" aria-label="breadcrumb" className="text-base mb-4">
         <Link
           underline="none"

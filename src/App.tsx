@@ -11,6 +11,8 @@ import NotFoundPage from '@/routes/NotFoundRoute.tsx'
 import ProcedurePage from '@/features/procedure/pages/ProcedurePage.tsx'
 import MessagePage from '@/features/message/pages/MessagePage.tsx'
 import SettingPage from '@/features/setting/pages/SettingPage.tsx'
+import ProcedureDetailPage from '@/features/procedure/pages/ProcedureDetailPage.tsx';
+import AllProceduresPage from '@/features/procedure/pages/AllProceduresPage.tsx';
 
 function App() {
   return (
@@ -40,6 +42,8 @@ function App() {
         }>
           <Route index element={<DashboardPage />} />
           <Route path="procedures" element={<ProcedurePage />} />
+          <Route path="procedures/:id" element={<ProcedureDetailPage />} />
+          <Route path="procedures/all/:type" element={<AllProceduresPage />} />
           <Route path="messages" element={<MessagePage />} />
           <Route path="settings" element={<SettingPage />} />
           <Route path="*" element={<NotFoundPage />} />

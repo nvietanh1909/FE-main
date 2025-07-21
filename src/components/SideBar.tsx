@@ -32,7 +32,7 @@ const menu = [
 export default function SideBar() {
   const location = useLocation();
   return (
-    <aside className="w-80 min-h-screen flex flex-col justify-between bg-[#EFF6FF] border-r border-gray-200">
+    <aside className="w-80 min-h-screen flex flex-col justify-between bg-[#F1F7FF] border-r border-gray-200">
       <nav className="flex flex-col gap-4 mt-[1rem]">
         {menu.map((item) => {
           const isActive = location.pathname === item.to;
@@ -44,9 +44,9 @@ export default function SideBar() {
                 ${isActive ? 'bg-[#e6f0ff]' : 'hover:bg-gray-100'}
               `}
             >
-              <span className={`text-xl  ${isActive ? 'text-[#1E40AF] font-semibold' : 'text-gray-500'}`}>{item.icon}</span>
-              <span className="flex-1 flex flex-col gap-1 text-left p-[0.2rem] ml-[0.2rem]">
-                <span className={`text-[1.1rem] leading-tight ${isActive ? 'text-[#1E40AF] font-semibold' : 'text-gray-800 font-normal'}`}>{item.label}</span>
+              <span className={`text-xl  ${isActive ? 'text-[#1E40AF] font-600 line-height-100%' : 'text-gray-500 line-height-100%'}`}>{item.icon}</span>
+              <span className="flex-1 flex flex-col text-left p-[0.2rem] ml-[0.2rem]">
+                <span className={`text-[1rem] leading-tight ${isActive ? 'text-[#1E40AF] font-600' : 'text-gray-800 font-normal'}`}>{item.label}</span>
                 <span className={`text-[0.86rem] leading-tight ${isActive ? 'text-[#1E40AF]' : 'text-gray-400'}`}>{item.desc}</span>
               </span>
               <FaChevronRight className={`text-base ${isActive ? 'text-[#1E40AF]' : 'text-gray-400'}`} />
