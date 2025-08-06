@@ -7,9 +7,17 @@ interface PublicRouteProps {
 }
 
 const PublicRoute = ({ children }: PublicRouteProps) => {
+    // Kiểm tra user đã đăng nhập
     if (isAuthenticated()) {
         return <Navigate to="/dashboard" replace />;
     }
+    
+    // Kiểm tra admin đã đăng nhập
+    const isAdminAuthenticated = sessionStorage.getItem('adminToken') === 'true';
+    if (isAdminAuthenticated) {
+        return <Navigate to="/admin" replace />;
+    }
+    
     return <>{children}</>;
 }
 

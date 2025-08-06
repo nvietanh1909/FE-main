@@ -7,6 +7,13 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+    // Kiểm tra nếu admin đã đăng nhập thì chuyển về admin dashboard
+    const isAdminAuthenticated = sessionStorage.getItem('adminToken') === 'true';
+    if (isAdminAuthenticated) {
+        return <Navigate to="/admin" replace />;
+    }
+    
+    // Kiểm tra user authentication
     if (!isAuthenticated()) {
         return <Navigate to="/login" replace />;
     }
