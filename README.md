@@ -56,3 +56,15 @@ npm run preview
   ```bash
   npm run lint
   ```
+
+## Tài khoản demo
+
+### Tài khoản User
+- **URL:** `/login`
+- **Username:** `user`
+- **Password:** `123`
+
+### Tài khoản Admin 
+- **URL:** `/admin/login`
+- **Username:** `admin`
+- **Password:** `123`
