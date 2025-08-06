@@ -1,17 +1,17 @@
 import React, { useEffect } from 'react';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Typography from '@mui/material/Typography';
-import { FaHome } from 'react-icons/fa';
+import { FaHome, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import nprogress from 'nprogress';
 import 'nprogress/nprogress.css';
-import { Box, Link, Button, InputBase, Grid } from '@mui/material';
-import { Check, CheckCircle, Menu, Search } from '@mui/icons-material';
+import { Box, Link, Button, InputBase, Collapse, Divider } from '@mui/material';
+import { Check, CheckCircle, Menu, Search, History, AccessTime } from '@mui/icons-material';
 import FlashOnIcon from '@mui/icons-material/FlashOn';
 import StarIcon from '@mui/icons-material/Star';
 import Welcome from "../components/Welcome.tsx";
 import ProcedureCard from '@/features-user/dashboard/components/ProcedureCard.tsx';
-import Progress from '@/features-user/dashboard/components/Progress.tsx';
 import { useState } from 'react';
+import { fontSize } from '@mui/system';
 
 
 export default function DashboardPage() {
@@ -45,28 +45,58 @@ export default function DashboardPage() {
 
   const procedures = [
     {
-      title: 'Quy trình thanh toán hoạt động thường xuyên',
+      id: 1,
+      title: 'QUY TRÌNH THANH TOÁN HOẠT ĐỘNG THƯỜNG XUYÊN',
       description: 'Thông tin về lương và các khoản phụ cấp',
-      date: 'Cập nhật: 01/01/2023',
+      date: 'Tháng 11/2024',
+      isExpanded: false,
+      subItems: [
+        '1. Công tác phí trong nước',
+        '2. Công tác phí nước ngoài', 
+        '3. Hội nghị, hội thảo trong nước',
+        '4. Hội nghị, hội thảo quốc tế tại Việt Nam do Nhà trường chủ trì tổ chức'
+      ]
     },
     {
-      title: 'Quy trình thanh toán chi phí hoạt động chuyên môn',
-      description: 'Chi tiết về các loại bảo hiểm và quyền lợi',
-      date: 'Cập nhật: 15/02/2023',
+      id: 2,
+      title: 'QUY TRÌNH THANH TOÁN CHI PHÍ HOẠT ĐỘNG CHUYÊN MÔN',
+      description: 'Thông tin về lương và các khoản phụ cấp',
+      date: 'Tháng 11/2024',
+      isExpanded: false,
+      subItems: []
     },
     {
-      title: 'Quy trình thanh toán mua sắm tài sản, hàng hóa, dịch vụ',
-      description: 'Thông tin nghỉ phép, tăng ca, lịch làm việc',
-      date: 'Cập nhật: 10/03/2023',
+      id: 3,
+      title: 'QUY TRÌNH THANH TOÁN MUA SẮM TÀI SẢN, HÀNG HÓA, DỊCH VỤ',
+      description: 'Thông tin về lương và các khoản phụ cấp',
+      date: 'Tháng 11/2024',
+      isExpanded: false,
+      subItems: []
     },
   ];
 
   const [searchTab, setSearchTab] = useState(0);
   const [searchMode, setSearchMode] = useState(0); // 0: thường, 1: thông minh
+  const [expandedProcedures, setExpandedProcedures] = useState<number[]>([]);
+  const [searchHistory, setSearchHistory] = useState<string[]>([
+    'Quy trình thanh toán công tác phí',
+    'Hồ sơ xin nghỉ phép',
+    'Thủ tục mua sắm tài sản',
+    'Báo cáo kết quả công việc',
+    'Đăng ký tham gia hội thảo'
+  ]);
+
+  const toggleProcedure = (id: number) => {
+    setExpandedProcedures(prev => 
+      prev.includes(id) 
+        ? prev.filter(item => item !== id)
+        : [...prev, id]
+    );
+  };
 
   return (
     <div className="py-4 px-6">
-      <Breadcrumbs separator=">" aria-label="breadcrumb" className=" mb-4">
+      <Breadcrumbs sx={{fontSize: "14px"}} separator=">" aria-label="breadcrumb" className=" mb-4">
         <Link
           underline="none"
           color="inherit"
@@ -76,7 +106,7 @@ export default function DashboardPage() {
           <FaHome className="text-lg" />
           <span>Trang chủ</span>
         </Link>
-        <Typography color="#2563eb" fontWeight={600}>
+        <Typography sx={{fontSize: "14px"}} color="#2563eb" fontWeight={600}>
           Bảng điều khiển
         </Typography>
       </Breadcrumbs>
@@ -88,7 +118,7 @@ export default function DashboardPage() {
         <Box sx={{ background: '#fff', borderRadius: 4, border: '1px solid #e5e7eb', p: 3 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box>
-              <Typography variant="h5" fontWeight={600}>
+              <Typography sx={{fontSize: "1.4rem"}} fontWeight={600}>
                 Tra cứu tìm kiếm thủ tục
               </Typography>
               <Typography variant="body2" color="text.secondary" mb={2} sx={{ fontFamily: 'Roboto, sans-serif, arial', fontSize: '0.9rem' }}>
@@ -144,18 +174,132 @@ export default function DashboardPage() {
           </Box>
           {searchTab === 0 && (
             <Box sx={{ mt: 2 }}>
-              <Typography variant="h6" fontWeight={600} mb={2}>
-                Danh sách quy trình và thủ tục thanh toán
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px', mt: 2 }}>
-                {procedures.map((proc, index) => (
-                  <ProcedureCard
-                    key={index}
-                    title={proc.title}
-                    description={proc.description}
-                    date={proc.date}
-                    onClick={() => console.log(`Clicked on ${proc.title}`)}
-                  />
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+                {procedures.map((proc) => (
+                  <Box key={proc.id} sx={{ mb: 1 }}>
+                    {/* Main Card */}
+                    <Box 
+                      onClick={() => proc.subItems.length > 0 && toggleProcedure(proc.id)}
+                      sx={{ 
+                        background: '#fff',
+                        borderRadius: 2,
+                        border: '1px solid #e0e7ff',
+                        borderLeft: '4px solid #2669FC',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                        cursor: proc.subItems.length > 0 ? 'pointer' : 'default',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          boxShadow: proc.subItems.length > 0 ? '0 2px 8px rgba(0,0,0,0.15)' : '0 1px 3px rgba(0,0,0,0.1)'
+                        }
+                      }}
+                    >
+                      <Box sx={{ p: 3 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Box sx={{ flex: 1 }}>
+                            <Typography 
+                              variant="h6" 
+                              fontWeight={700} 
+                              sx={{ 
+                                color: '#1e40af', 
+                                fontSize: '1rem', 
+                                mb: 1,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.02em'
+                              }}
+                            >
+                              {proc.title}
+                            </Typography>
+                            <Typography 
+                              variant="body2" 
+                              sx={{ 
+                                fontSize: '0.85rem', 
+                                color: '#6b7280',
+                                mb: 2
+                              }}
+                            >
+                              {proc.description}
+                            </Typography>
+                            <Box sx={{ 
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              background: '#dbeafe', 
+                              color: '#1e40af',
+                              px: 2,
+                              py: 0.5,
+                              borderRadius: 100,
+                              fontSize: '0.75rem',
+                              fontWeight: 600
+                            }}>
+                              {proc.date}
+                            </Box>
+                          </Box>
+                          {proc.subItems.length > 0 && (
+                            <Box sx={{ 
+                              ml: 3,
+                              color: expandedProcedures.includes(proc.id) ? '#1e40af' : '#9ca3af',
+                              transition: 'all 0.2s ease'
+                            }}>
+                              {expandedProcedures.includes(proc.id) ? (
+                                <FaChevronUp style={{ fontSize: '16px' }} />
+                              ) : (
+                                <FaChevronDown style={{ fontSize: '16px' }} />
+                              )}
+                            </Box>
+                          )}
+                        </Box>
+                      </Box>
+                    </Box>
+                    
+                    {/* Expanded Content */}
+                    {proc.subItems.length > 0 && (
+                      <Collapse in={expandedProcedures.includes(proc.id)}>
+                        <Box sx={{ 
+                          mt: 1,
+                          background: '#fff',
+                          border: '1px solid #e0e7ff',
+                          borderRadius: 2,
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                        }}>
+                          {proc.subItems.map((item, index) => (
+                            <Box key={index}>
+                              <Box sx={{ 
+                                p: 3,
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                cursor: 'pointer',
+                                '&:hover': {
+                                  background: '#f8fafc'
+                                }
+                              }}>
+                                <Box sx={{ 
+                                  width: 6,
+                                  height: 6,
+                                  borderRadius: '50%',
+                                  background: '#3b82f6',
+                                  mr: 3,
+                                  mt: 0.75,
+                                  flexShrink: 0
+                                }} />
+                                <Typography 
+                                  variant="body2" 
+                                  sx={{ 
+                                    fontSize: '0.9rem', 
+                                    color: '#374151',
+                                    lineHeight: 1.5
+                                  }}
+                                >
+                                  {item}
+                                </Typography>
+                              </Box>
+                              {index < proc.subItems.length - 1 && (
+                                <Divider sx={{ mx: 3 }} />
+                              )}
+                            </Box>
+                          ))}
+                        </Box>
+                      </Collapse>
+                    )}
+                  </Box>
                 ))}
               </Box>
             </Box>
@@ -223,26 +367,77 @@ export default function DashboardPage() {
                   <Search sx={{ color: '#fff' }} />
                 </Button>
               </Box>
+
+              {/* Lịch sử tìm kiếm gần đây */}
+              <Box sx={{ mt: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                  <History sx={{ color: '#6b7280', fontSize: 20 }} />
+                  <Typography variant="h6" fontWeight={600} sx={{ color: '#374151', fontSize: '1rem' }}>
+                    Lịch sử tìm kiếm gần đây
+                  </Typography>
+                </Box>
+                
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {searchHistory.map((item, index) => (
+                    <Box 
+                      key={index}
+                      sx={{ 
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        p: 2,
+                        borderRadius: 2,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          backgroundColor: '#f8fafc',
+                          borderColor: '#2563eb'
+                        }
+                      }}
+                    >
+                      <AccessTime sx={{ color: '#9ca3af', fontSize: 16 }} />
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          color: '#374151',
+                          fontSize: '0.9rem',
+                          flex: 1
+                        }}
+                      >
+                        {item}
+                      </Typography>
+                      <Typography 
+                        variant="caption" 
+                        sx={{ 
+                          color: '#9ca3af',
+                          fontSize: '0.75rem'
+                        }}
+                      >
+                        {index === 0 ? 'Vừa xong' : `${index + 1} ngày trước`}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+
+                <Box sx={{ mt: 2, textAlign: 'center' }}>
+                  <Button
+                    variant="text"
+                    sx={{
+                      textTransform: 'none',
+                      color: '#2563eb',
+                      fontSize: '0.85rem',
+                      fontWeight: 500,
+                      '&:hover': {
+                        backgroundColor: '#f0f9ff'
+                      }
+                    }}
+                  >
+                    Xem tất cả lịch sử
+                  </Button>
+                </Box>
+              </Box>
             </Box>
           )}
-        </Box>
-        <Box sx={{ mt: 2, background: '#fff', borderRadius: 4, border: '1px solid #e5e7eb', p: 3 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Box>
-              <Typography variant="h5" fontWeight={600} sx={{ fontFamily: 'Roboto, sans-serif, arial' }}>
-                Lịch sử thủ tục
-              </Typography>
-              <Typography variant="body2" color="text.secondary" mb={2} sx={{ fontFamily: 'Roboto, sans-serif, arial', fontSize: '1rem' }}>
-                Danh sách thủ tục của bạn đã tra cứu
-              </Typography>
-            </Box>
-            <Link href="/procedures" style={{ textDecoration: 'none', color: '#2563eb' }}>
-              Xem tất cả
-            </Link>
-          </Box>
-          <Box sx={{ width: '100%', maxWidth: '100%' }}>
-            <Progress />
-          </Box>
         </Box>
       </div>
     </div>

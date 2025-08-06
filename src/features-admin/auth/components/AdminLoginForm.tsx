@@ -63,7 +63,7 @@ export default function AdminLoginForm() {
                         <span className="text-xs font-bold text-white">A</span>
                     </div>
                 </div>
-                <div className="text-center">
+                <div className="text-left">
                     <h1 className="text-3xl m-0 font-bold bg-gradient-to-r from-[#0080ff] to-[#0066cc] bg-clip-text text-transparent mb-2">
                         Admin Portal
                     </h1>

@@ -203,7 +203,6 @@ export default function ConversationList({
                     fontSize: '11px',
                     fontWeight: 700,
                     ml: 1,
-                    boxShadow: '0 2px 4px rgba(239, 68, 68, 0.3)',
                   }}>
                     {conversation.unread > 99 ? '99+' : conversation.unread}
                   </Box>

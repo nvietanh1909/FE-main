@@ -38,7 +38,7 @@ export default function MessagePage() {
   const [selectedConversation, setSelectedConversation] = useState<number | null>(1); // Mặc định chọn cuộc trò chuyện đầu tiên
   
   // Mock data
-  const [conversations] = useState<Conversation[]>([
+  const [conversations, setConversations] = useState<Conversation[]>([
     {
       id: 1,
       name: 'Nguyễn Đức Anh',
@@ -86,46 +86,122 @@ export default function MessagePage() {
     }
   ]);
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      text: 'Chào bạn, tôi cần hỗ trợ về quy trình thanh toán',
-      isMe: false,
-      time: '10:25'
-    },
-    {
-      id: 2,
-      text: 'Chào bạn! Tôi có thể giúp bạn với quy trình thanh toán. Bạn cần hỗ trợ cụ thể về vấn đề gì?',
-      isMe: true,
-      time: '10:26'
-    },
-    {
-      id: 3,
-      text: 'Tôi muốn biết cách thanh toán chi phí hoạt động chuyên môn',
-      isMe: false,
-      time: '10:30'
-    }
-  ]);
+  // Tin nhắn cho từng cuộc trò chuyện
+  const [conversationMessages, setConversationMessages] = useState<{[key: number]: Message[]}>({
+    1: [
+      {
+        id: 1,
+        text: 'Chào bạn, tôi cần hỗ trợ về quy trình thanh toán',
+        isMe: false,
+        time: '10:25'
+      },
+      {
+        id: 2,
+        text: 'Chào bạn! Tôi có thể giúp bạn với quy trình thanh toán. Bạn cần hỗ trợ cụ thể về vấn đề gì?',
+        isMe: true,
+        time: '10:26'
+      },
+      {
+        id: 3,
+        text: 'Tôi muốn biết cách thanh toán chi phí hoạt động chuyên môn',
+        isMe: false,
+        time: '10:30'
+      }
+    ],
+    2: [
+      {
+        id: 1,
+        text: 'Xin chào, tôi cần hỗ trợ về thủ tục mới',
+        isMe: false,
+        time: '9:10'
+      },
+      {
+        id: 2,
+        text: 'Chào bạn! Tôi sẽ hướng dẫn bạn về thủ tục mới',
+        isMe: true,
+        time: '9:12'
+      },
+      {
+        id: 3,
+        text: 'Cảm ơn bạn đã hỗ trợ!',
+        isMe: false,
+        time: '9:15'
+      }
+    ],
+    3: [
+      {
+        id: 1,
+        text: 'Bạn có thể gửi tài liệu hướng dẫn không?',
+        isMe: false,
+        time: 'Hôm qua'
+      },
+      {
+        id: 2,
+        text: 'Tài liệu đã được gửi',
+        isMe: true,
+        time: 'Hôm qua'
+      }
+    ],
+    4: [
+      {
+        id: 1,
+        text: 'Xin chào, tôi muốn tìm hiểu về thủ tục mới',
+        isMe: false,
+        time: 'Hôm qua'
+      }
+    ],
+    5: [
+      {
+        id: 1,
+        text: 'Tôi có vấn đề khẩn cấp cần hỗ trợ',
+        isMe: false,
+        time: '2 ngày'
+      },
+      {
+        id: 2,
+        text: 'Bạn có thể gọi điện cho tôi không?',
+        isMe: false,
+        time: '2 ngày'
+      }
+    ]
+  });
 
   const handleSelectConversation = (id: number) => {
     setSelectedConversation(id);
+    
+    // Đánh dấu tin nhắn đã đọc khi click vào cuộc trò chuyện
+    setConversations(prev => 
+      prev.map(conv => 
+        conv.id === id 
+          ? { ...conv, unread: 0 }
+          : conv
+      )
+    );
   };
 
   const handleSendMessage = (messageText: string) => {
+    if (!selectedConversation) return;
+    
+    const currentMessages = conversationMessages[selectedConversation] || [];
     const newMessage: Message = {
-      id: messages.length + 1,
+      id: currentMessages.length + 1,
       text: messageText,
       isMe: true,
       time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
     };
-    setMessages([...messages, newMessage]);
+    
+    setConversationMessages(prev => ({
+      ...prev,
+      [selectedConversation]: [...currentMessages, newMessage]
+    }));
   };
 
   const selectedConversationData = conversations.find(c => c.id === selectedConversation);
+  const currentMessages = selectedConversation ? conversationMessages[selectedConversation] || [] : [];
 
   return (
     <div className="py-4 px-6">
-      <Breadcrumbs separator=">" aria-label="breadcrumb" className="text-base mb-4">
+      <Breadcrumbs sx={{fontSize: "14px"}} separator=">" aria-label="breadcrumb" className="text-base mb-4">
         <Link
           underline="none"
           color="inherit"
@@ -135,7 +211,7 @@ export default function MessagePage() {
           <FaHome className="text-lg" />
           <span>Trang chủ</span>
         </Link>
-        <Typography color="#2563eb" fontWeight={600}>
+        <Typography sx={{fontSize: "14px"}} color="#2563eb" fontWeight={600}>
           Tin nhắn
         </Typography>
       </Breadcrumbs>
@@ -165,7 +241,7 @@ export default function MessagePage() {
             conversationId={selectedConversation}
             conversationName={selectedConversationData?.name || ''}
             isOnline={selectedConversationData?.isOnline || false}
-            messages={messages}
+            messages={currentMessages}
             onSendMessage={handleSendMessage}
           />
         </Box>

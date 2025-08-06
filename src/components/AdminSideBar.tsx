@@ -82,7 +82,7 @@ export default function AdminSideBar() {
               {/* Content */}
               <div className="ml-4 flex-1">
                 <div
-                  className={`font-medium text-sm transition-colors duration-200 ${
+                  className={`font-medium text-[1rem] transition-colors duration-200 ${
                     isActive ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
                   }`}
                 >

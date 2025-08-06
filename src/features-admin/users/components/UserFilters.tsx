@@ -84,10 +84,10 @@ export default function UserFilters({
 
                 {activeFilters > 0 && (
                     <Chip
-                        icon={<FaFilter />}
+                        icon={<FaFilter size={12} />}
                         label={`${activeFilters} bộ lọc`}
                         size="small"
-                        sx={{ backgroundColor: '#dbeafe', color: '#1e40af' }}
+                        sx={{ backgroundColor: '#dbeafe', padding: '4px 8px' }}
                     />
                 )}
 
