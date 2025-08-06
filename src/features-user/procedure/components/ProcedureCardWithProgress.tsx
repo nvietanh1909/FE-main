@@ -77,39 +77,6 @@ export default function ProcedureCardWithProgress({ id, title, description, prog
         </Box>
       </Box>
 
-      {/* Progress Section */}
-      <Box sx={{ mb: 3, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-          <Typography variant="body2" fontWeight={600} sx={{ color: '#374151' }}>
-            Tiến độ
-          </Typography>
-          <Typography 
-            variant="body2" 
-            fontWeight={700}
-            sx={{ 
-              color: getProgressColor(progress),
-              fontSize: '0.9rem'
-            }}
-          >
-            {progress}%
-          </Typography>
-        </Box>
-        <LinearProgress
-          variant="determinate"
-          value={progress}
-          sx={{
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: '#f3f4f6',
-            '& .MuiLinearProgress-bar': {
-              borderRadius: 4,
-              backgroundColor: getProgressColor(progress),
-              transition: 'all 0.3s ease'
-            },
-          }}
-        />
-      </Box>
-
       {/* Action Button */}
       <Button
         variant="contained"

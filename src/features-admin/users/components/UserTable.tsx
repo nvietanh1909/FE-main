@@ -49,9 +49,8 @@ export default function UserTable({ users, onEdit, onDelete, onView }: UserTable
                         <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Người dùng</TableCell>
                         <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Email</TableCell>
                         <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Vai trò</TableCell>
-                        <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Trạng thái</TableCell>
                         <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Đăng nhập cuối</TableCell>
-                        <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Thao tác</TableCell>
+                        {/* <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Thao tác</TableCell> */}
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -84,22 +83,11 @@ export default function UserTable({ users, onEdit, onDelete, onView }: UserTable
                                 />
                             </TableCell>
                             <TableCell>
-                                <Chip 
-                                    label={user.status === 'active' ? 'Hoạt động' : 'Không hoạt động'}
-                                    size="small"
-                                    sx={{ 
-                                        backgroundColor: `${getStatusColor(user.status)}15`,
-                                        color: getStatusColor(user.status),
-                                        fontWeight: 500
-                                    }}
-                                />
-                            </TableCell>
-                            <TableCell>
                                 <Typography variant="body2" sx={{ color: '#64748b' }}>
                                     {user.lastLogin}
                                 </Typography>
                             </TableCell>
-                            <TableCell>
+                            {/* <TableCell>
                                 <Box sx={{ display: 'flex', gap: 1 }}>
                                     <IconButton 
                                         size="small" 
@@ -123,7 +111,7 @@ export default function UserTable({ users, onEdit, onDelete, onView }: UserTable
                                         <FaTrash />
                                     </IconButton>
                                 </Box>
-                            </TableCell>
+                            </TableCell> */}
                         </TableRow>
                     ))}
                 </TableBody>

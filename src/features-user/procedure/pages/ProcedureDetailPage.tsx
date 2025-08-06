@@ -124,11 +124,6 @@ export default function ProcedureDetailPage() {
                 <Typography variant="h5" fontWeight={700} sx={{ color: '#1f2937' }}>
                   {currentStep.title}
                 </Typography>
-                <Chip 
-                  label={currentStep.status} 
-                  color={getStatusColor(currentStep.status)}
-                  size="small"
-                />
               </Box>
               <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                 <Chip 
