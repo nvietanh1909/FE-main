@@ -52,7 +52,7 @@ export default function SettingPage() {
 
   return (
     <div className="py-4 px-6">
-      <Breadcrumbs separator=">" aria-label="breadcrumb" className="text-base mb-4">
+      <Breadcrumbs sx={{fontSize: "14px"}} separator=">" aria-label="breadcrumb" className="text-base mb-4">
         <Link
           underline="none"
           color="inherit"
@@ -62,18 +62,17 @@ export default function SettingPage() {
           <FaHome className="text-lg" />
           <span>Trang chủ</span>
         </Link>
-        <Typography color="#2563eb" fontWeight={600}>
+        <Typography sx={{fontSize: "14px"}} color="#2563eb" fontWeight={600}>
           Cài đặt
         </Typography>
       </Breadcrumbs>
 
       {/* User Profile Section */}
-      <Box sx={{ mt: 3 }}>
+      <Box sx={{ mt: 2 }}>
         <Paper sx={{ p: 4, borderRadius: 3, border: '1px solid #e5e7eb' }}>
           {/* Header */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <FaUser style={{ fontSize: '24px', color: '#3b82f6' }} />
               <Typography variant="h5" fontWeight={600}>
                 Thông tin cá nhân
               </Typography>
@@ -178,14 +177,13 @@ export default function SettingPage() {
 
             <TextField
               label="Email"
-              value={isEditing ? editForm.email : userInfo.email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
-              disabled={!isEditing}
+              value={userInfo.email}
+              disabled
               fullWidth
               variant="outlined"
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  backgroundColor: isEditing ? '#fff' : '#f9fafb'
+                  backgroundColor: '#f3f4f6'
                 }
               }}
             />
@@ -206,28 +204,26 @@ export default function SettingPage() {
 
             <TextField
               label="Phòng ban"
-              value={isEditing ? editForm.department : userInfo.department}
-              onChange={(e) => handleInputChange('department', e.target.value)}
-              disabled={!isEditing}
+              value={userInfo.department}
+              disabled
               fullWidth
               variant="outlined"
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  backgroundColor: isEditing ? '#fff' : '#f9fafb'
+                  backgroundColor: '#f3f4f6'
                 }
               }}
             />
 
             <TextField
               label="Chức vụ"
-              value={isEditing ? editForm.position : userInfo.position}
-              onChange={(e) => handleInputChange('position', e.target.value)}
-              disabled={!isEditing}
+              value={userInfo.position}
+              disabled
               fullWidth
               variant="outlined"
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  backgroundColor: isEditing ? '#fff' : '#f9fafb'
+                  backgroundColor: '#f3f4f6'
                 }
               }}
             />
@@ -266,8 +262,8 @@ export default function SettingPage() {
 
           {/* Info Note */}
           {!isEditing && (
-            <Box sx={{ mt: 3, p: 2, backgroundColor: '#f0f9ff', borderRadius: 2, border: '1px solid #bae6fd' }}>
-              <Typography variant="body2" color="#0369a1">
+            <Box sx={{ mt: 3, p: 2, backgroundColor: '#EFF6FF', borderRadius: 2, border: '1px solid #bae6fd' }}>
+              <Typography variant="body2" color="#1E40C7">
                 💡 Nhấn "Chỉnh sửa" để cập nhật thông tin cá nhân của bạn
               </Typography>
             </Box>

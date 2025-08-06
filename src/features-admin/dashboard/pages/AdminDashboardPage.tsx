@@ -57,10 +57,10 @@ export default function AdminDashboardPage() {
             color: '#10b981'
         },
         { 
-            title: 'Báo cáo thống kê', 
-            desc: 'Xem và xuất báo cáo hệ thống',
-            icon: <FaChartBar />,
-            path: '/admin/reports',
+            title: 'Tin nhắn', 
+            desc: 'Xem tin nhắn và hỗ trợ người dùng',
+            icon: <FaComments />,
+            path: '/admin/messages',
             color: '#f59e0b'
         },
         { 
@@ -84,7 +84,7 @@ export default function AdminDashboardPage() {
             {/* Header Section */}
             <div className="bg-white border-b">
                 <div className="px-6 py-4">
-                    <Breadcrumbs separator=">" aria-label="breadcrumb" className="text-base mb-4">
+                    <Breadcrumbs  sx={{fontSize: "14px"}} separator=">" aria-label="breadcrumb" className="text-base mb-4">
                             <Link
                               underline="none"
                               color="inherit"
@@ -94,7 +94,7 @@ export default function AdminDashboardPage() {
                               <FaHome className="text-lg" />
                               <span>Trang chủ</span>
                             </Link>
-                            <Typography color="#2563eb" fontWeight={600}>
+                            <Typography sx={{fontSize: "14px"}}  color="#2563eb" fontWeight={600}>
                               Bảng điều khiển
                             </Typography>
                     </Breadcrumbs>
@@ -104,7 +104,7 @@ export default function AdminDashboardPage() {
             <div className="px-6">
                 {/* Stats Cards */}
                 <div className="mb-6">
-                    <h2 className="text-[1.4rem] font-bold text-gray-800 mb-4">
+                    <h2 className="text-[1.4rem] font-bold mt-0 text-gray-800 mb-4">
                         Thống kê tổng quan
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

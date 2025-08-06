@@ -47,7 +47,7 @@ export default function AdminConversationList({
         borderBottom: '1px solid #e5e7eb',
         backgroundColor: '#fff'
       }}>
-        <Typography variant="h6" fontWeight={600} mb={2} sx={{ color: '#1e293b' }}>
+        <Typography fontWeight={600} mb={2} sx={{fontSize: "1.4rem", color: '#1e293b' }}>
           Tin nhắn từ người dùng
         </Typography>
         
@@ -219,7 +219,6 @@ export default function AdminConversationList({
                     fontSize: '11px',
                     fontWeight: 700,
                     ml: 1,
-                    boxShadow: '0 2px 4px rgba(239, 68, 68, 0.3)',
                   }}>
                     {conversation.unread > 99 ? '99+' : conversation.unread}
                   </Box>

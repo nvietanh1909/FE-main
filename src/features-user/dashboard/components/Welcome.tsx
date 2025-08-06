@@ -23,7 +23,7 @@ export default function Welcome({ name, notificationCount }: WelcomeProps) {
             color: '#1E40B7',
             '& .MuiAlert-icon': {
                 color: '#1E40B7',
-                fontSize: '1.2rem',
+                fontSize: '1.1rem',
                 display: 'flex',
                 alignItems: 'top',
                 marginTop: '2px', 
@@ -32,9 +32,10 @@ export default function Welcome({ name, notificationCount }: WelcomeProps) {
             <AlertTitle sx={{
                 marginBottom: '0',
                 color: '#1E40B7',
-                fontWeight: '600'
+                fontWeight: '600',
+                fontSize: '0.98rem',
             }}>Xin chào {user.name}</AlertTitle>
-            <div className="text-sm text-[#1E40B7]">
+            <div className="text-[0.8rem] text-[#1E40B7]">
                 Hôm nay là ngày {user.date}. Bạn có <b>{notificationCount}</b> thông báo mới cần xem xét.
             </div>
         </Alert>

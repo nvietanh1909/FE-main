@@ -39,7 +39,7 @@ export default function AdminMessagePage() {
   const [selectedConversation, setSelectedConversation] = useState<number | null>(1);
   
   // Mock data - Admin conversations
-  const [conversations] = useState<Conversation[]>([
+  const [conversations, setConversations] = useState<Conversation[]>([
     {
       id: 1,
       name: 'Nguyễn Văn A',
@@ -83,46 +83,120 @@ export default function AdminMessagePage() {
    
   ]);
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      text: 'Chào admin, tôi cần hỗ trợ về quy trình thanh toán',
-      isMe: false,
-      time: '10:25'
-    },
-    {
-      id: 2,
-      text: 'Chào bạn! Tôi sẽ hỗ trợ bạn. Bạn gặp vấn đề gì cụ thể với quy trình thanh toán?',
-      isMe: true,
-      time: '10:26'
-    },
-    {
-      id: 3,
-      text: 'Tôi muốn biết cách thanh toán chi phí hoạt động chuyên môn',
-      isMe: false,
-      time: '10:30'
-    }
-  ]);
+  // Tin nhắn cho từng cuộc trò chuyện admin
+  const [conversationMessages, setConversationMessages] = useState<{[key: number]: Message[]}>({
+    1: [
+      {
+        id: 1,
+        text: 'Chào admin, tôi cần hỗ trợ về quy trình thanh toán',
+        isMe: false,
+        time: '10:25'
+      },
+      {
+        id: 2,
+        text: 'Chào bạn! Tôi sẽ hỗ trợ bạn. Bạn gặp vấn đề gì cụ thể với quy trình thanh toán?',
+        isMe: true,
+        time: '10:26'
+      },
+      {
+        id: 3,
+        text: 'Tôi muốn biết cách thanh toán chi phí hoạt động chuyên môn',
+        isMe: false,
+        time: '10:30'
+      }
+    ],
+    2: [
+      {
+        id: 1,
+        text: 'Xin chào admin, tôi có thắc mắc về quy định nghỉ phép',
+        isMe: false,
+        time: '9:10'
+      },
+      {
+        id: 2,
+        text: 'Chào bạn! Tôi sẽ giải đáp thắc mắc về quy định nghỉ phép cho bạn',
+        isMe: true,
+        time: '9:12'
+      },
+      {
+        id: 3,
+        text: 'Cảm ơn admin đã hỗ trợ!',
+        isMe: false,
+        time: '9:15'
+      }
+    ],
+    3: [
+      {
+        id: 1,
+        text: 'Admin ơi, tôi quên mật khẩu hệ thống rồi',
+        isMe: false,
+        time: 'Hôm qua'
+      },
+      {
+        id: 2,
+        text: 'Tôi sẽ hướng dẫn bạn reset mật khẩu ngay',
+        isMe: true,
+        time: 'Hôm qua'
+      },
+      {
+        id: 3,
+        text: 'Có thể giúp tôi reset mật khẩu không?',
+        isMe: false,
+        time: 'Hôm qua'
+      }
+    ],
+    4: [
+      {
+        id: 1,
+        text: 'Admin, hệ thống báo cáo có vấn đề gì không ạ?',
+        isMe: false,
+        time: 'Hôm qua'
+      },
+      {
+        id: 2,
+        text: 'Chúng tôi đang kiểm tra hệ thống, sẽ thông báo kết quả sớm',
+        isMe: true,
+        time: 'Hôm qua'
+      }
+    ]
+  });
 
   const handleSelectConversation = (id: number) => {
     setSelectedConversation(id);
+    
+    // Đánh dấu tin nhắn đã đọc khi click vào cuộc trò chuyện
+    setConversations(prev => 
+      prev.map(conv => 
+        conv.id === id 
+          ? { ...conv, unread: 0 }
+          : conv
+      )
+    );
   };
 
   const handleSendMessage = (messageText: string) => {
+    if (!selectedConversation) return;
+    
+    const currentMessages = conversationMessages[selectedConversation] || [];
     const newMessage: Message = {
-      id: messages.length + 1,
+      id: currentMessages.length + 1,
       text: messageText,
       isMe: true,
       time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
     };
-    setMessages([...messages, newMessage]);
+    
+    setConversationMessages(prev => ({
+      ...prev,
+      [selectedConversation]: [...currentMessages, newMessage]
+    }));
   };
 
   const selectedConversationData = conversations.find(c => c.id === selectedConversation);
+  const currentMessages = selectedConversation ? conversationMessages[selectedConversation] || [] : [];
 
   return (
     <div className="py-4 px-6">
-      <Breadcrumbs separator=">" aria-label="breadcrumb" className="text-base mb-4">
+      <Breadcrumbs  sx={{fontSize: "14px"}} separator=">" aria-label="breadcrumb" className="text-base mb-4">
         <Link
           underline="none"
           color="inherit"
@@ -132,7 +206,7 @@ export default function AdminMessagePage() {
           <FaHome className="text-lg" />
           <span>Trang chủ</span>
         </Link>
-        <Typography color="#2563eb" fontWeight={600}>
+        <Typography  sx={{fontSize: "14px"}} color="#2563eb" fontWeight={600}>
           Tin nhắn
         </Typography>
       </Breadcrumbs>
@@ -163,7 +237,7 @@ export default function AdminMessagePage() {
             conversationName={selectedConversationData?.name || ''}
             isOnline={selectedConversationData?.isOnline || false}
             department={selectedConversationData?.department || ''}
-            messages={messages}
+            messages={currentMessages}
             onSendMessage={handleSendMessage}
           />
         </Box>

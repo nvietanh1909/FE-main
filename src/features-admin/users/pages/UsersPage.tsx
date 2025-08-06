@@ -230,7 +230,7 @@ export default function UsersPage() {
     return (
         <div className="py-4 px-6">
             {/* Breadcrumbs */}
-            <Breadcrumbs separator=">" aria-label="breadcrumb" className="mb-4">
+            <Breadcrumbs sx={{fontSize: "14px"}} separator=">" aria-label="breadcrumb" className="mb-4">
                 <Link
                     underline="none"
                     color="inherit"
@@ -240,7 +240,7 @@ export default function UsersPage() {
                     <FaHome className="text-lg" />
                     <span>Trang chủ</span>
                 </Link>
-                <Typography color="#2563eb" fontWeight={600}>
+                <Typography sx={{fontSize: "14px"}} color="#2563eb" fontWeight={600}>
                     Quản lý người dùng
                 </Typography>
             </Breadcrumbs>
@@ -250,7 +250,7 @@ export default function UsersPage() {
                     {/* Header */}
                     <Box sx={{ mb: 4, pt: 2 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                            <Typography variant="h4" sx={{ color: '#1e293b', fontWeight: 700, fontSize: '1.75rem' }}>
+                            <Typography sx={{ fontSize: "1.4rem", color: '#1e293b', fontWeight: 700 }}>
                                 Quản lý người dùng
                             </Typography>
                         </Box>

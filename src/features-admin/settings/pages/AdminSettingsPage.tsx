@@ -17,7 +17,7 @@ export default function AdminSettingsPage() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [adminInfo, setAdminInfo] = useState({
-    fullName: 'Nguyễn Quản Trị',
+    fullName: 'Nguyễn Đức Anh',
     email: 'admin@uet.vnu.edu.vn',
     phone: '0901234567',
     department: 'Phòng IT',
@@ -53,7 +53,7 @@ export default function AdminSettingsPage() {
 
   return (
     <div className="py-4 px-6">
-      <Breadcrumbs separator=">" aria-label="breadcrumb" className="text-base mb-4">
+      <Breadcrumbs sx={{fontSize: "14px"}} separator=">" aria-label="breadcrumb" className="text-base mb-4">
         <Link
           underline="none"
           color="inherit"
@@ -63,18 +63,17 @@ export default function AdminSettingsPage() {
           <FaHome className="text-lg" />
           <span>Trang chủ</span>
         </Link>
-        <Typography color="#2563eb" fontWeight={600}>
+        <Typography sx={{fontSize: "14px"}}color="#2563eb" fontWeight={600}>
           Cài đặt
         </Typography>
       </Breadcrumbs>
 
       {/* Admin Profile Section */}
-      <Box sx={{ mt: 3 }}>
+      <Box sx={{ mt: 2 }}>
         <Paper sx={{ p: 4, borderRadius: 3, border: '1px solid #e5e7eb' }}>
           {/* Header */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <FaUser style={{ fontSize: '24px', color: '#3b82f6' }} />
               <Typography variant="h5" fontWeight={600}>
                 Thông tin quản trị viên
               </Typography>
