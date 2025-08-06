@@ -95,7 +95,6 @@ export default function FileTable({
               <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Tài liệu</TableCell>
               <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Mô tả</TableCell>
               <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Danh mục</TableCell>
-              <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Kích thước</TableCell>
               <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Ngày tải lên</TableCell>
               <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Người tải</TableCell>
               <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Thao tác</TableCell>
@@ -148,9 +147,6 @@ export default function FileTable({
                           fontWeight: 500
                         }} 
                       />
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">{file.size}</Typography>
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2">{file.uploadDate}</Typography>

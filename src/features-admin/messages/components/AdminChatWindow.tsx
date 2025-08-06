@@ -138,19 +138,7 @@ export default function AdminChatWindow({
             </Box>
           </Box>
         </Box>
-
-        {/* Action Buttons */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <IconButton size="small" sx={{ color: '#6b7280' }}>
-            <Phone />
-          </IconButton>
-          <IconButton size="small" sx={{ color: '#6b7280' }}>
-            <VideoCall />
-          </IconButton>
-          <IconButton size="small" sx={{ color: '#6b7280' }}>
-            <Info />
-          </IconButton>
-        </Box>
+        
       </Box>
 
       {/* Messages Area */}

@@ -115,17 +115,7 @@ export default function ChatWindow({
           </Box>
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <IconButton sx={{ color: '#3b82f6' }}>
-            <Phone />
-          </IconButton>
-          <IconButton sx={{ color: '#3b82f6' }}>
-            <VideoCall />
-          </IconButton>
-          <IconButton sx={{ color: '#3b82f6' }}>
-            <Info />
-          </IconButton>
-        </Box>
+      
       </Box>
 
       {/* Messages Area */}
