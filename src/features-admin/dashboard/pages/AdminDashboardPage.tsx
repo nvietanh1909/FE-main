@@ -50,7 +50,7 @@ export default function AdminDashboardPage() {
             color: '#3b82f6'
         },
         { 
-            title: 'Quản lý quy trình', 
+            title: 'Quản lý tài liệu', 
             desc: 'Tạo và chỉnh sửa quy trình thủ tục',
             icon: <FaClipboardList />,
             path: '/admin/procedures',
