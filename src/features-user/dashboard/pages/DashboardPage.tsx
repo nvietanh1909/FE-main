@@ -52,7 +52,7 @@ export default function DashboardPage() {
       isExpanded: false,
       subItems: [
         '1. Công tác phí trong nước',
-        '2. Công tác phí nước ngoài', 
+        '2. Công tác phí nước ngoài',
         '3. Hội nghị, hội thảo trong nước',
         '4. Hội nghị, hội thảo quốc tế tại Việt Nam do Nhà trường chủ trì tổ chức'
       ]
@@ -87,8 +87,8 @@ export default function DashboardPage() {
   ]);
 
   const toggleProcedure = (id: number) => {
-    setExpandedProcedures(prev => 
-      prev.includes(id) 
+    setExpandedProcedures(prev =>
+      prev.includes(id)
         ? prev.filter(item => item !== id)
         : [...prev, id]
     );
@@ -96,7 +96,7 @@ export default function DashboardPage() {
 
   return (
     <div className="py-4 px-6">
-      <Breadcrumbs sx={{fontSize: "14px"}} separator=">" aria-label="breadcrumb" className=" mb-4">
+      <Breadcrumbs sx={{ fontSize: "14px" }} separator=">" aria-label="breadcrumb" className=" mb-4">
         <Link
           underline="none"
           color="inherit"
@@ -106,7 +106,7 @@ export default function DashboardPage() {
           <FaHome className="text-lg" />
           <span>Trang chủ</span>
         </Link>
-        <Typography sx={{fontSize: "14px"}} color="#2563eb" fontWeight={600}>
+        <Typography sx={{ fontSize: "14px" }} color="#2563eb" fontWeight={600}>
           Bảng điều khiển
         </Typography>
       </Breadcrumbs>
@@ -118,7 +118,7 @@ export default function DashboardPage() {
         <Box sx={{ background: '#fff', borderRadius: 4, border: '1px solid #e5e7eb', p: 3 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box>
-              <Typography sx={{fontSize: "1.4rem"}} fontWeight={600}>
+              <Typography sx={{ fontSize: "1.4rem" }} fontWeight={600}>
                 Tra cứu tìm kiếm thủ tục
               </Typography>
               <Typography variant="body2" color="text.secondary" mb={2} sx={{ fontFamily: 'Roboto, sans-serif, arial', fontSize: '0.9rem' }}>
@@ -126,7 +126,7 @@ export default function DashboardPage() {
               </Typography>
             </Box>
             <Link href="/procedures" style={{ textDecoration: 'none', color: '#2563eb' }}>
-              Xem tất cả 
+              Xem tất cả
             </Link>
           </Box>
           <Box sx={{ display: 'flex', gap: 1, mb: 2, mt: 2 }}>
@@ -178,9 +178,9 @@ export default function DashboardPage() {
                 {procedures.map((proc) => (
                   <Box key={proc.id} sx={{ mb: 1 }}>
                     {/* Main Card */}
-                    <Box 
+                    <Box
                       onClick={() => proc.subItems.length > 0 && toggleProcedure(proc.id)}
-                      sx={{ 
+                      sx={{
                         background: '#fff',
                         borderRadius: 2,
                         border: '1px solid #e0e7ff',
@@ -196,12 +196,12 @@ export default function DashboardPage() {
                       <Box sx={{ p: 3 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <Box sx={{ flex: 1 }}>
-                            <Typography 
-                              variant="h6" 
-                              fontWeight={700} 
-                              sx={{ 
-                                color: '#1e40af', 
-                                fontSize: '1rem', 
+                            <Typography
+                              variant="h6"
+                              fontWeight={700}
+                              sx={{
+                                color: '#1e40af',
+                                fontSize: '1rem',
                                 mb: 1,
                                 textTransform: 'uppercase',
                                 letterSpacing: '0.02em'
@@ -209,20 +209,20 @@ export default function DashboardPage() {
                             >
                               {proc.title}
                             </Typography>
-                            <Typography 
-                              variant="body2" 
-                              sx={{ 
-                                fontSize: '0.85rem', 
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontSize: '0.85rem',
                                 color: '#6b7280',
                                 mb: 2
                               }}
                             >
                               {proc.description}
                             </Typography>
-                            <Box sx={{ 
+                            <Box sx={{
                               display: 'inline-flex',
                               alignItems: 'center',
-                              background: '#dbeafe', 
+                              background: '#dbeafe',
                               color: '#1e40af',
                               px: 2,
                               py: 0.5,
@@ -234,7 +234,7 @@ export default function DashboardPage() {
                             </Box>
                           </Box>
                           {proc.subItems.length > 0 && (
-                            <Box sx={{ 
+                            <Box sx={{
                               ml: 3,
                               color: expandedProcedures.includes(proc.id) ? '#1e40af' : '#9ca3af',
                               transition: 'all 0.2s ease'
@@ -249,56 +249,58 @@ export default function DashboardPage() {
                         </Box>
                       </Box>
                     </Box>
-                    
                     {/* Expanded Content */}
                     {proc.subItems.length > 0 && (
-                      <Collapse in={expandedProcedures.includes(proc.id)}>
-                        <Box sx={{ 
-                          mt: 1,
-                          background: '#fff',
-                          border: '1px solid #e0e7ff',
-                          borderRadius: 2,
-                          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-                        }}>
-                          {proc.subItems.map((item, index) => (
-                            <Box key={index}>
-                              <Box sx={{ 
-                                p: 3,
-                                display: 'flex',
-                                alignItems: 'flex-start',
-                                cursor: 'pointer',
-                                '&:hover': {
-                                  background: '#f8fafc'
-                                }
-                              }}>
-                                <Box sx={{ 
-                                  width: 6,
-                                  height: 6,
-                                  borderRadius: '50%',
-                                  background: '#3b82f6',
-                                  mr: 3,
-                                  mt: 0.75,
-                                  flexShrink: 0
-                                }} />
-                                <Typography 
-                                  variant="body2" 
-                                  sx={{ 
-                                    fontSize: '0.9rem', 
-                                    color: '#374151',
-                                    lineHeight: 1.5
-                                  }}
-                                >
-                                  {item}
-                                </Typography>
+                      <a href={`/procedures/${proc.id}`} style={{ textDecoration: 'none' }}>
+                        <Collapse in={expandedProcedures.includes(proc.id)}>
+                          <Box sx={{
+                            mt: 1,
+                            background: '#fff',
+                            border: '1px solid #e0e7ff',
+                            borderRadius: 2,
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                          }}>
+                            {proc.subItems.map((item, index) => (
+                              <Box key={index}>
+                                <Box sx={{
+                                  p: 3,
+                                  display: 'flex',
+                                  alignItems: 'flex-start',
+                                  cursor: 'pointer',
+                                  '&:hover': {
+                                    background: '#f8fafc'
+                                  }
+                                }}>
+                                  <Box sx={{
+                                    width: 6,
+                                    height: 6,
+                                    borderRadius: '50%',
+                                    background: '#3b82f6',
+                                    mr: 3,
+                                    mt: 0.75,
+                                    flexShrink: 0
+                                  }} />
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      fontSize: '0.9rem',
+                                      color: '#374151',
+                                      lineHeight: 1.5
+                                    }}
+                                  >
+                                    {item}
+                                  </Typography>
+                                </Box>
+                                {index < proc.subItems.length - 1 && (
+                                  <Divider sx={{ mx: 3 }} />
+                                )}
                               </Box>
-                              {index < proc.subItems.length - 1 && (
-                                <Divider sx={{ mx: 3 }} />
-                              )}
-                            </Box>
-                          ))}
-                        </Box>
-                      </Collapse>
+                            ))}
+                          </Box>
+                        </Collapse>
+                      </a>
                     )}
+
                   </Box>
                 ))}
               </Box>
@@ -376,12 +378,12 @@ export default function DashboardPage() {
                     Lịch sử tìm kiếm gần đây
                   </Typography>
                 </Box>
-                
+
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                   {searchHistory.map((item, index) => (
-                    <Box 
+                    <Box
                       key={index}
-                      sx={{ 
+                      sx={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: 2,
@@ -396,9 +398,9 @@ export default function DashboardPage() {
                       }}
                     >
                       <AccessTime sx={{ color: '#9ca3af', fontSize: 16 }} />
-                      <Typography 
-                        variant="body2" 
-                        sx={{ 
+                      <Typography
+                        variant="body2"
+                        sx={{
                           color: '#374151',
                           fontSize: '0.9rem',
                           flex: 1
@@ -406,9 +408,9 @@ export default function DashboardPage() {
                       >
                         {item}
                       </Typography>
-                      <Typography 
-                        variant="caption" 
-                        sx={{ 
+                      <Typography
+                        variant="caption"
+                        sx={{
                           color: '#9ca3af',
                           fontSize: '0.75rem'
                         }}
