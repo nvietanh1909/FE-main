@@ -54,6 +54,32 @@ export default function AdminSideBar() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(false);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const [selectedTitle, setSelectedTitle] = useState<string | null>(null);
+
+  const processList: ProcessItem[] = [
+    {
+      id: "p1",
+      title: "Quy trình thanh toán hoạt động thường xuyên",
+      children: [
+        { id: "p1c1", title: "Công tác phí trong nước" },
+        { id: "p1c2", title: "Công tác phí nước ngoài" },
+        { id: "p1c3", title: "Hội nghị, hội thảo trong nước" },
+        { id: "p1c4", title: "Hội nghị, hội thảo quốc tế tại Việt Nam" },
+      ],
+    },
+    {
+      id: "p2",
+      title: "Quy trình mua sắm trang thiết bị",
+      children: [
+        { id: "p2c1", title: "Mua máy tính" },
+        { id: "p2c2", title: "Mua bàn ghế" },
+        { id: "p2c3", title: "Mua vật tư tiêu hao" },
+      ],
+    },
+  ];
 
   return (
     <aside
@@ -68,57 +94,109 @@ export default function AdminSideBar() {
       {/* Navigation */}
       <nav className="flex-1 py-4">
         {adminMenu.map((item) => {
-          const isActive =
-            item.to === '/admin'
-              ? location.pathname === '/admin'
-              : location.pathname.startsWith(item.to);
+  const isActive =
+    item.to === '/admin'
+      ? location.pathname === '/admin'
+      : location.pathname.startsWith(item.to);
 
-          return (
-            <Link
-              to={item.to}
-              key={item.label}
-              className={`no-underline group relative flex items-center px-2 py-4 text-left transition-all duration-200 hover:bg-blue-50 ${
-                isActive ? 'bg-blue-50 border-r-4 border-blue-500' : ''
+  const isDocumentManager = item.label === 'Quản lý tài liệu';
+
+  return (
+    <div key={item.label}>
+      <Link
+        to={item.to}
+        className={`no-underline group relative flex items-center px-2 py-4 text-left transition-all duration-200 hover:bg-blue-50 ${
+          isActive ? 'bg-blue-50 border-r-4 border-blue-500' : ''
+        }`}
+        onClick={(e) => {
+          if (isDocumentManager) {
+            e.preventDefault(); // prevent navigation
+            setOpenDropdown((prev) => !prev);
+          }
+        }}
+      >
+        {/* Icon */}
+        <div
+          className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-200 ${
+            isActive
+              ? 'bg-blue-500 text-white'
+              : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
+          }`}
+        >
+          <span className="text-lg flex items-center justify-center">{item.icon}</span>
+        </div>
+
+        {/* Content */}
+        {!collapsed && (
+          <div className="ml-4 flex-1 flex justify-between items-center">
+            <div
+              className={`font-medium text-[1rem] transition-colors duration-200 ${
+                isActive ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
               }`}
             >
-              {/* Icon */}
-              <div
-                className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-200 ${
-                  isActive
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
+              {item.label}
+            </div>
+
+            {/* Dropdown arrow */}
+            {isDocumentManager && (
+              <svg
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  openDropdown ? 'rotate-90' : ''
                 }`}
+                fill="currentColor"
+                viewBox="0 0 20 20"
               >
-                <span className="text-lg flex items-center justify-center">{item.icon}</span>
+                <path
+                  fillRule="evenodd"
+                  d="M6 6L14 10L6 14V6Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            )}
+          </div>
+        )}
+      </Link>
+
+      {/* Submenu */}
+      {isDocumentManager && openDropdown && !collapsed && (
+        <div className="ml-16 mt-2 space-y-2">
+          {/* Các link tĩnh */}
+          <Link to="/admin/documents" className="text-sm text-gray-600 hover:text-blue-600 block">
+            Tài liệu nội bộ
+          </Link>
+          <Link to="/admin/reports" className="text-sm text-gray-600 hover:text-blue-600 block">
+            Báo cáo
+          </Link>
+          {/* Render nguyên thẻ SidebarItem với dữ liệu mẫu */}
+          <div>
+            {processList.map((item, idx) => (
+              <div
+                key={item.id}
+                className={`flex items-center px-2 py-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                  selectedItem === item.id
+                    ? 'bg-blue-50 text-blue-600'
+                    : 'text-gray-700 hover:bg-blue-50'
+                }`}
+                onClick={() => {
+                  setSelectedItem(item.id);
+                  setSelectedTitle(item.title);
+                }}
+              >
+                <div className="flex-1">{item.title}</div>
+                {openIndex === idx ? (
+                  <FaAngleDoubleLeft className="w-4 h-4" />
+                ) : (
+                  <FaAngleDoubleRight className="w-4 h-4" />
+                )}
               </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+})}
 
-              {/* Content */}
-              {!collapsed && (
-                <div className="ml-4 flex-1">
-                  <div
-                    className={`font-medium text-[1rem] transition-colors duration-200 ${
-                      isActive ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
-                    }`}
-                  >
-                    {item.label}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-0.5 leading-tight">
-                    {item.desc}
-                  </div>
-                </div>
-              )}
-
-              {/* Arrow indicator for active item */}
-              {isActive && !collapsed && (
-                <div className="text-blue-500">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-              )}
-            </Link>
-          );
-        })}
       </nav>
 
       {/* Footer */}

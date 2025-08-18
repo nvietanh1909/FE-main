@@ -14,6 +14,7 @@ import { FiChevronDown, FiChevronRight } from "react-icons/fi";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditForm from "../components/EditForm.tsx";
+import SidebarItem, { ProcessItem } from "../../../components/SidebarItem.tsx";
 import ProcedureStepper from '@/features-user/procedure/components/ProcedureStepper.tsx';
 
 // ====== Data for sidebar ======
@@ -240,7 +241,7 @@ export default function AdminDocumentPage() {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <div className="w-80 border-r overflow-y-auto">
+      {/* <div className="w-80 border-r overflow-y-auto">
         <h2 className="bg-blue-600 text-white p-4 text-lg font-bold">
           DANH MỤC QUY TRÌNH
         </h2>
@@ -258,7 +259,7 @@ export default function AdminDocumentPage() {
             }}
           />
         ))}
-      </div>
+      </div> */}
 
       {/* Content */}
       <div className="flex-1 p-6 overflow-y-auto">
