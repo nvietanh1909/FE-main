@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Box,
   Paper,
@@ -166,19 +167,36 @@ function ModalWrapper({
 
 // ====== Main Component ======
 export default function AdminDocumentPage() {
+  const location = useLocation();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [selectedTitle, setSelectedTitle] = useState<string>("");
   const [activeStep, setActiveStep] = useState(0);
 
-  // Remove showForm entirely
-  // const [showForm, setShowForm] = useState(false);
-	// state
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const processId = params.get('process');
+    const itemId = params.get('item');
+    
+    if (processId && itemId) {
+      const processIndex = processList.findIndex(p => p.id === processId);
+      if (processIndex !== -1) {
+        setOpenIndex(processIndex);
+        
+        const process = processList[processIndex];
+        const item = process.children?.find(c => c.id === itemId);
+        if (item) {
+          setSelectedItem(itemId);
+          setSelectedTitle(item.title);
+        }
+      }
+    }
+  }, [location.search]);
+
 	const [formMode, setFormMode] = useState<"add" | "edit" | null>(null);
 	const [editRow, setEditRow] = useState<ChiPhiItem | null>(null);
 	const [editIndex, setEditIndex] = useState<number | null>(null);
 
-	// open handlers
 	const openAddForm = () => {
 	  setFormMode("add");
 	  setEditRow(null);
@@ -239,26 +257,6 @@ export default function AdminDocumentPage() {
 
   return (
     <div className="flex h-screen">
-      {/* Sidebar */}
-      <div className="w-80 border-r overflow-y-auto">
-        <h2 className="bg-blue-600 text-white p-4 text-lg font-bold">
-          DANH MỤC QUY TRÌNH
-        </h2>
-        {processList.map((item, idx) => (
-          <SidebarItem
-            key={item.id}
-            item={item}
-            isOpen={openIndex === idx}
-            onToggle={() => setOpenIndex(openIndex === idx ? null : idx)}
-            selected={selectedItem}
-            onSelect={(id, title) => {
-              setSelectedItem(id);
-              setSelectedTitle(title);
-              setActiveStep(0);
-            }}
-          />
-        ))}
-      </div>
 
       {/* Content */}
       <div className="flex-1 p-6 overflow-y-auto">
@@ -407,7 +405,6 @@ export default function AdminDocumentPage() {
 				<EditForm
 				  onClose={closeForm}
 				  onSubmit={handleSubmit}
-				  initialData={formMode === "edit" ? editRow : null}
 				/>
 			  </ModalWrapper>
 			)}

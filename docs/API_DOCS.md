@@ -869,3 +869,260 @@ Sử dụng JWT Token authentication
 **Response:** File preview URL or content
 
 ---
+
+## 8. NAVIGATION & MENU APIs
+
+### 8.1 Get Admin Menu Structure
+**GET** `/admin/menu`
+
+**Headers:** `Authorization: Bearer <admin_token>`
+
+**Response Success (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "menu": [
+      {
+        "id": "dashboard",
+        "label": "Bảng điều khiển",
+        "desc": "Tổng quan hệ thống",
+        "icon": "MdDashboard",
+        "to": "/admin",
+        "order": 1
+      },
+      {
+        "id": "documents",
+        "label": "Quản lý tài liệu",
+        "desc": "Tài liệu cập nhật",
+        "icon": "FaClipboardList",
+        "to": "/admin/documents",
+        "order": 3,
+        "children": [
+          {
+            "id": "payment-process",
+            "label": "Quy trình thanh toán hoạt động thường xuyên",
+            "desc": "Quản lý quy trình thanh toán",
+            "to": "/admin/documents?category=payment",
+            "children": [
+              {
+                "id": "domestic-business",
+                "label": "1. Công tác phí trong nước",
+                "to": "/admin/documents?process=p1&item=p1c1"
+              },
+              {
+                "id": "foreign-business",
+                "label": "2. Công tác phí nước ngoài",
+                "to": "/admin/documents?process=p1&item=p1c2"
+              },
+              {
+                "id": "domestic-conference",
+                "label": "3. Hội nghị, hội thảo trong nước",
+                "to": "/admin/documents?process=p1&item=p1c3"
+              },
+              {
+                "id": "international-conference",
+                "label": "4. Hội nghị, hội thảo quốc tế tại Việt Nam",
+                "to": "/admin/documents?process=p1&item=p1c4"
+              }
+            ]
+          },
+          {
+            "id": "procurement-process",
+            "label": "Quy trình mua sắm trang thiết bị",
+            "desc": "Quản lý quy trình mua sắm",
+            "to": "/admin/documents?category=procurement",
+            "children": [
+              {
+                "id": "computer",
+                "label": "1. Mua máy tính",
+                "to": "/admin/documents?process=p2&item=p2c1"
+              },
+              {
+                "id": "furniture",
+                "label": "2. Mua bàn ghế",
+                "to": "/admin/documents?process=p2&item=p2c2"
+              },
+              {
+                "id": "supplies",
+                "label": "3. Mua vật tư tiêu hao",
+                "to": "/admin/documents?process=p2&item=p2c3"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 9. DOCUMENT PROCESS APIs
+
+### 9.1 Get Process List
+**GET** `/admin/documents/processes`
+
+**Headers:** `Authorization: Bearer <admin_token>`
+
+**Response Success (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "processes": [
+      {
+        "id": "p1",
+        "title": "Quy trình thanh toán hoạt động thường xuyên",
+        "category": "payment",
+        "children": [
+          {
+            "id": "p1c1",
+            "title": "Công tác phí trong nước",
+            "steps": [
+              {
+                "id": 1,
+                "label": "Bước 1",
+                "sublabel": "Chuẩn bị hồ sơ",
+                "content": {
+                  "title": "Chuẩn bị hồ sơ cần thiết",
+                  "requirements": [
+                    "Đơn đề nghị thanh toán công tác phí (theo mẫu)",
+                    "Bảng kê chi tiết các khoản chi phí phát sinh",
+                    "Các hóa đơn, chứng từ gốc (vé máy bay, hóa đơn khách sạn, taxi...)"
+                  ],
+                  "documents": ["Đơn đề nghị", "Bảng kê chi phí", "Hóa đơn gốc"],
+                  "timeEstimate": "1-2 ngày làm việc"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### 9.2 Get Process by ID
+**GET** `/admin/documents/processes/{processId}`
+
+**Headers:** `Authorization: Bearer <admin_token>`
+
+**Query Parameters:**
+- `item` (optional): ID của item con cụ thể
+
+**Response Success (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "process": {
+      "id": "p1",
+      "title": "Quy trình thanh toán hoạt động thường xuyên",
+      "selectedItem": {
+        "id": "p1c1",
+        "title": "Công tác phí trong nước",
+        "steps": [...]
+      }
+    }
+  }
+}
+```
+
+### 9.3 Update Process Steps
+**PUT** `/admin/documents/processes/{processId}/items/{itemId}/steps`
+
+**Headers:** `Authorization: Bearer <admin_token>`
+
+**Request Body:**
+```json
+{
+  "steps": [
+    {
+      "id": 1,
+      "label": "Bước 1",
+      "sublabel": "Chuẩn bị hồ sơ",
+      "content": {
+        "title": "Chuẩn bị hồ sơ cần thiết",
+        "requirements": ["..."],
+        "documents": ["..."],
+        "timeEstimate": "1-2 ngày làm việc"
+      }
+    }
+  ]
+}
+```
+
+### 9.4 Add Cost Item
+**POST** `/admin/documents/processes/{processId}/items/{itemId}/costs`
+
+**Headers:** `Authorization: Bearer <admin_token>`
+
+**Request Body:**
+```json
+{
+  "thanhPhan": "string",
+  "donGia": "number",
+  "dinhMuc": "number", 
+  "soLuong": "number",
+  "luuY": "string"
+}
+```
+
+### 9.5 Update Cost Item
+**PUT** `/admin/documents/processes/{processId}/items/{itemId}/costs/{costId}`
+
+**Headers:** `Authorization: Bearer <admin_token>`
+
+**Request Body:**
+```json
+{
+  "thanhPhan": "string",
+  "donGia": "number",
+  "dinhMuc": "number",
+  "soLuong": "number", 
+  "luuY": "string"
+}
+```
+
+### 9.6 Delete Cost Item
+**DELETE** `/admin/documents/processes/{processId}/items/{itemId}/costs/{costId}`
+
+**Headers:** `Authorization: Bearer <admin_token>`
+
+---
+
+## 10. SIDEBAR STATE MANAGEMENT
+
+### 10.1 Save Sidebar State
+**POST** `/user/preferences/sidebar`
+
+**Headers:** `Authorization: Bearer <token>`
+
+**Request Body:**
+```json
+{
+  "collapsed": "boolean",
+  "expandedMenus": ["string"]
+}
+```
+
+### 10.2 Get Sidebar State
+**GET** `/user/preferences/sidebar`
+
+**Headers:** `Authorization: Bearer <token>`
+
+**Response Success (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "collapsed": false,
+    "expandedMenus": ["Quản lý tài liệu"]
+  }
+}
+```
+
+---

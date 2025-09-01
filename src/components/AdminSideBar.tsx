@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaUsers, FaClipboardList, FaCog, FaComments } from 'react-icons/fa';
+import { FaUsers, FaClipboardList, FaCog, FaComments, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { MdDashboard } from 'react-icons/md';
 import { SiGoogledocs } from "react-icons/si";
 import { Link, useLocation } from 'react-router-dom';
@@ -23,6 +23,50 @@ const adminMenu = [
     desc: 'Tài liệu cập nhật',
     icon: <FaClipboardList />,
     to: '/admin/documents',
+    children: [
+      {
+        label: 'Quy trình thanh toán hoạt động thường xuyên',
+        desc: 'Quản lý quy trình thanh toán',
+        to: '/admin/documents?category=payment',
+        children: [
+          {
+            label: '1. Công tác phí trong nước',
+            to: '/admin/documents?process=p1&item=p1c1',
+          },
+          {
+            label: '2. Công tác phí nước ngoài',
+            to: '/admin/documents?process=p1&item=p1c2',
+          },
+          {
+            label: '3. Hội nghị, hội thảo trong nước',
+            to: '/admin/documents?process=p1&item=p1c3',
+          },
+          {
+            label: '4. Hội nghị, hội thảo quốc tế tại Việt Nam',
+            to: '/admin/documents?process=p1&item=p1c4',
+          }
+        ]
+      },
+      {
+        label: 'Quy trình mua sắm trang thiết bị',
+        desc: 'Quản lý quy trình mua sắm',
+        to: '/admin/documents?category=procurement',
+        children: [
+          {
+            label: '1. Mua máy tính',
+            to: '/admin/documents?process=p2&item=p2c1',
+          },
+          {
+            label: '2. Mua bàn ghế',
+            to: '/admin/documents?process=p2&item=p2c2',
+          },
+          {
+            label: '3. Mua vật tư tiêu hao',
+            to: '/admin/documents?process=p2&item=p2c3',
+          }
+        ]
+      }
+    ],
   },
   {
     label: 'Quản lý người dùng',
@@ -54,6 +98,127 @@ export default function AdminSideBar() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
+
+  const toggleSubmenu = (label: string) => {
+    setExpandedMenus(prev => 
+      prev.includes(label) 
+        ? prev.filter(item => item !== label)
+        : [...prev, label]
+    );
+  };
+
+  const renderMenuItem = (item: any, level: number = 0) => {
+    // Chỉ check active cho level 0 (menu chính)
+    const isActive = level === 0 ? (
+      item.to === '/admin'
+        ? location.pathname === '/admin'
+        : location.pathname.startsWith(item.to)
+    ) : false;
+    
+    const hasChildren = item.children && item.children.length > 0;
+    const isExpanded = expandedMenus.includes(item.label);
+    const paddingLeft = level === 0 ? 'px-2' : level === 1 ? 'pl-16 pr-2' : 'pl-20 pr-2';
+
+    if (hasChildren) {
+      return (
+        <div key={item.label}>
+          {/* Parent menu item */}
+          <div
+            className={`group relative flex items-center ${paddingLeft} py-4 text-left transition-all duration-200 hover:bg-blue-50 cursor-pointer ${
+              isActive ? 'bg-blue-50 border-r-4 border-blue-500' : ''
+            }`}
+            onClick={() => toggleSubmenu(item.label)}
+          >
+            {/* Icon - only show for top level */}
+            {level === 0 && (
+              <div
+                className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-200 ${
+                  isActive
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
+                }`}
+              >
+                <span className="text-lg flex items-center justify-center">{item.icon}</span>
+              </div>
+            )}
+
+            {/* Content */}
+            {!collapsed && (
+              <div className={`${level === 0 ? 'ml-4' : ''} flex-1`}>
+                <div
+                  className={`font-medium ${level === 0 ? 'text-[1rem]' : 'text-sm'} transition-colors duration-200 ${
+                    isActive ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
+                  }`}
+                >
+                  {item.label}
+                </div>
+                <div className="text-xs text-gray-500  mt-0.5 leading-tight">
+                  {item.desc}
+                </div>
+              </div>
+            )}
+
+            {/* Dropdown indicator */}
+            {!collapsed && (
+              <div className="text-gray-400">
+                {isExpanded ? <FaChevronDown className="w-3 h-3" /> : <FaChevronRight className="w-3 h-3" />}
+              </div>
+            )}
+          </div>
+
+          {/* Submenu items */}
+          {!collapsed && isExpanded && (
+            <div className={level === 0 ? '!bg-white' : '!bg-white'}>
+              {item.children.map((child: any) => renderMenuItem(child, level + 1))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Leaf menu item without children
+    const leafIsActive = level === 0 && location.pathname === item.to;
+    
+    return (
+      <Link
+        to={item.to}
+        key={item.label}
+        className={`no-underline group relative flex items-center ${paddingLeft} py-3 text-left transition-all duration-200 hover:bg-blue-50 ${
+          leafIsActive ? 'bg-blue-100 border-r-4 border-blue-500' : ''
+        }`}
+      >
+        {/* Icon - only show for top level */}
+        {level === 0 && (
+          <div
+            className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-200 ${
+              leafIsActive
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
+            }`}
+          >
+            <span className="text-lg flex items-center justify-center">{item.icon}</span>
+          </div>
+        )}
+
+        {/* Content */}
+        {!collapsed && (
+          <div className={`${level === 0 ? 'ml-4' : ''} flex-1`}>
+            <div
+              className={`font-medium ${level === 0 ? 'text-[1rem]' : 'text-sm'} transition-colors duration-200 ${
+                leafIsActive ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
+              }`}
+            >
+              {item.label}
+            </div>
+            <div className="text-xs text-gray-500 mt-0.5 leading-tight">
+              {item.desc}
+            </div>
+          </div>
+        )}
+      </Link>
+    );
+  };
 
   return (
     <aside
@@ -67,58 +232,7 @@ export default function AdminSideBar() {
     >
       {/* Navigation */}
       <nav className="flex-1 py-4">
-        {adminMenu.map((item) => {
-          const isActive =
-            item.to === '/admin'
-              ? location.pathname === '/admin'
-              : location.pathname.startsWith(item.to);
-
-          return (
-            <Link
-              to={item.to}
-              key={item.label}
-              className={`no-underline group relative flex items-center px-2 py-4 text-left transition-all duration-200 hover:bg-blue-50 ${
-                isActive ? 'bg-blue-50 border-r-4 border-blue-500' : ''
-              }`}
-            >
-              {/* Icon */}
-              <div
-                className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-200 ${
-                  isActive
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
-                }`}
-              >
-                <span className="text-lg flex items-center justify-center">{item.icon}</span>
-              </div>
-
-              {/* Content */}
-              {!collapsed && (
-                <div className="ml-4 flex-1">
-                  <div
-                    className={`font-medium text-[1rem] transition-colors duration-200 ${
-                      isActive ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
-                    }`}
-                  >
-                    {item.label}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-0.5 leading-tight">
-                    {item.desc}
-                  </div>
-                </div>
-              )}
-
-              {/* Arrow indicator for active item */}
-              {isActive && !collapsed && (
-                <div className="text-blue-500">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-              )}
-            </Link>
-          );
-        })}
+        {adminMenu.map((item) => renderMenuItem(item))}
       </nav>
 
       {/* Footer */}
