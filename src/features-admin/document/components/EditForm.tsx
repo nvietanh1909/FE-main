@@ -82,7 +82,7 @@ const EditForm: React.FC<EditFormProps> = ({ onClose, onSubmit, initialData }) =
       )}
 
       <Typography variant="h6" fontWeight={600} gutterBottom>
-        {isEdit ? '✏️ CẬP NHẬT DÒNG' : '📝 NHẬP LIỆU BẢNG DỰ TOÁN'}
+        {isEdit ? 'CẬP NHẬT DÒNG' : 'NHẬP LIỆU BẢNG DỰ TOÁN'}
       </Typography>
 
       <Autocomplete
