@@ -26,7 +26,6 @@ interface UploadedFile {
 export default function AdminProcedurePage() {
   const [openUploadDialog, setOpenUploadDialog] = useState(false);
 
-  // Mock data cho files đã upload
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([
     {
       id: 1,

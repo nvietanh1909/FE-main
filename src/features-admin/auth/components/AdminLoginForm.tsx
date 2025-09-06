@@ -64,7 +64,7 @@ export default function AdminLoginForm() {
                     </div>
                 </div>
                 <div className="text-left">
-                    <h1 className="text-3xl m-0 font-bold bg-gradient-to-r from-[#0080ff] to-[#0066cc] bg-clip-text text-transparent mb-2">
+                    <h1 className="text-3xl m-0 !font-bold bg-gradient-to-r from-[#0080ff] to-[#0066cc] bg-clip-text text-transparent mb-1">
                         Admin Portal
                     </h1>
                     <p className="text-gray-500 m-0 text-sm font-medium">Hệ thống quản trị viên</p>
@@ -77,7 +77,7 @@ export default function AdminLoginForm() {
                         <TextField 
                             id="email"
                             label="Email"
-                            placeholder="admin@example.com"
+                            placeholder="admin@gmail.com"
                             variant="outlined"
                             size="medium"
                             sx={{

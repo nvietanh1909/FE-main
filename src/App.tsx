@@ -11,8 +11,6 @@ import NotFoundPage from '@/routes/NotFoundRoute.tsx'
 import ProcedurePage from '@/features-user/procedure/pages/ProcedurePage.tsx'
 import MessagePage from '@/features-user/message/pages/MessagePage.tsx'
 import SettingPage from '@/features-user/setting/pages/SettingPage.tsx'
-import ProcedureDetailPage from '@/features-user/procedure/pages/ProcedureDetailPage.tsx';
-import AllProceduresPage from '@/features-user/procedure/pages/AllProceduresPage.tsx';
 import AdminLoginPage from '@/features-admin/auth/pages/AdminLoginPage.tsx';
 import AdminDashboardPage from '@/features-admin/dashboard/pages/AdminDashboardPage.tsx';
 import AdminProtectedRoute from '@/routes/AdminProtectedRoute.tsx';
@@ -71,8 +69,6 @@ function App() {
         }>
           <Route index element={<DashboardPage />} />
           <Route path="procedures" element={<ProcedurePage />} />
-          <Route path="procedures/:id" element={<ProcedureDetailPage />} />
-          <Route path="procedures/all/:type" element={<AllProceduresPage />} />
           <Route path="messages" element={<MessagePage />} />
           <Route path="settings" element={<SettingPage />} />
           <Route path="*" element={<NotFoundPage />} />

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { FaUsers, FaClipboardList, FaCog, FaComments } from 'react-icons/fa';
+import { FaUsers, FaClipboardList, FaCog, FaComments, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { MdDashboard } from 'react-icons/md';
 import { SiGoogledocs } from "react-icons/si";
 import { Link, useLocation } from 'react-router-dom';
 import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
+import { IoDocumentText } from "react-icons/io5";
+import { RiFlowChart } from "react-icons/ri";
 
 const adminMenu = [
   {
@@ -13,16 +15,58 @@ const adminMenu = [
     to: '/admin',
   },
   {
-    label: 'Quản lý quy trình',
-    desc: 'Quy trình và thủ tục thanh toán',
-    icon: <FaClipboardList />,
+    label: 'Quản lý tài liệu',
+    desc: 'Tài liệu cập nhật',
+    icon: <IoDocumentText />,
     to: '/admin/procedures',
   },
   {
-    label: 'Quản lý tài liệu',
-    desc: 'Tài liệu cập nhật',
-    icon: <FaClipboardList />,
+    label: 'Quản lý quy trình',
+    desc: 'Quy trình và thủ tục thanh toán',
+    icon: <RiFlowChart />,
     to: '/admin/documents',
+    children: [
+      {
+        label: 'Quy trình thanh toán hoạt động thường xuyên',
+        to: '/admin/documents?category=payment',
+        children: [
+          {
+            label: '1. Công tác phí trong nước',
+            to: '/admin/documents?process=p1&item=p1c1',
+          },
+          {
+            label: '2. Công tác phí nước ngoài',
+            to: '/admin/documents?process=p1&item=p1c2',
+          },
+          {
+            label: '3. Hội nghị, hội thảo trong nước',
+            to: '/admin/documents?process=p1&item=p1c3',
+          },
+          {
+            label: '4. Hội nghị, hội thảo quốc tế tại Việt Nam',
+            to: '/admin/documents?process=p1&item=p1c4',
+          }
+        ]
+      },
+      {
+        label: 'Quy trình mua sắm trang thiết bị',
+        to: '/admin/documents?category=procurement',
+        children: [
+          {
+            label: '1. Mua máy tính',
+            to: '/admin/documents?process=p2&item=p2c1',
+          },
+          {
+            label: '2. Mua bàn ghế',
+            to: '/admin/documents?process=p2&item=p2c2',
+          },
+          {
+            label: '3. Mua vật tư tiêu hao',
+            to: '/admin/documents?process=p2&item=p2c3',
+          }
+        ]
+      }
+    ],
   },
   {
     label: 'Quản lý người dùng',
@@ -30,12 +74,12 @@ const adminMenu = [
     icon: <FaUsers />,
     to: '/admin/users',
   },
-  {
-    label: 'Quản lý hồ sơ',
-    desc: 'Quản lý hồ sơ',
-    icon: <SiGoogledocs />,
-    to: '/admin/applications',
-  },
+  // {
+  //   label: 'Quản lý hồ sơ',
+  //   desc: 'Quản lý hồ sơ',
+  //   icon: <SiGoogledocs />,
+  //   to: '/admin/applications',
+  // },
   {
     label: 'Tin nhắn',
     desc: 'Hỗ trợ và trao đổi',
@@ -54,38 +98,133 @@ export default function AdminSideBar() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [hovered, setHovered] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState(false);
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
-  const [selectedTitle, setSelectedTitle] = useState<string | null>(null);
+  const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
 
-  const processList: ProcessItem[] = [
-    {
-      id: "p1",
-      title: "Quy trình thanh toán hoạt động thường xuyên",
-      children: [
-        { id: "p1c1", title: "Công tác phí trong nước" },
-        { id: "p1c2", title: "Công tác phí nước ngoài" },
-        { id: "p1c3", title: "Hội nghị, hội thảo trong nước" },
-        { id: "p1c4", title: "Hội nghị, hội thảo quốc tế tại Việt Nam" },
-      ],
-    },
-    {
-      id: "p2",
-      title: "Quy trình mua sắm trang thiết bị",
-      children: [
-        { id: "p2c1", title: "Mua máy tính" },
-        { id: "p2c2", title: "Mua bàn ghế" },
-        { id: "p2c3", title: "Mua vật tư tiêu hao" },
-      ],
-    },
-  ];
+  const toggleSubmenu = (label: string) => {
+    setExpandedMenus(prev => 
+      prev.includes(label) 
+        ? prev.filter(item => item !== label)
+        : [...prev, label]
+    );
+  };
+
+  const renderMenuItem = (item: any, level: number = 0) => {
+    // Chỉ check active cho level 0 (menu chính)
+    const isActive = level === 0 ? (
+      item.to === '/admin'
+        ? location.pathname === '/admin'
+        : location.pathname.startsWith(item.to)
+    ) : false;
+    
+    const hasChildren = item.children && item.children.length > 0;
+    const isExpanded = expandedMenus.includes(item.label);
+    const paddingLeft = level === 0 ? 'px-2' : level === 1 ? 'pl-16 pr-2' : 'pl-20 pr-2';
+
+    if (hasChildren) {
+      return (
+        <div key={item.label}>
+          {/* Parent menu item */}
+          <div
+            className={`group relative flex items-center ${paddingLeft} py-4 text-left transition-all duration-200 hover:bg-blue-50 cursor-pointer ${
+              isActive ? 'bg-blue-50 border-r-4 border-blue-500' : ''
+            }`}
+            onClick={() => toggleSubmenu(item.label)}
+          >
+            {/* Icon - only show for top level */}
+            {level === 0 && (
+              <div
+                className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-200 ${
+                  isActive
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
+                }`}
+              >
+                <span className="text-lg flex items-center justify-center">{item.icon}</span>
+              </div>
+            )}
+
+            {/* Content */}
+            {!collapsed && (
+              <div className={`${level === 0 ? 'ml-4' : ''} flex-1`}>
+                <div
+                  className={`font-medium ${level === 0 ? 'text-[1rem]' : 'text-sm'} transition-colors duration-200 ${
+                    isActive ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
+                  }`}
+                >
+                  {item.label}
+                </div>
+                <div className="text-xs text-gray-500  mt-0.5 leading-tight">
+                  {item.desc}
+                </div>
+              </div>
+            )}
+
+            {/* Dropdown indicator */}
+            {!collapsed && (
+              <div className="text-gray-400">
+                {isExpanded ? <FaChevronDown className="w-2.6 h-2.6" /> : <FaChevronRight className="w-2.6 h-2.6" />}
+              </div>
+            )}
+          </div>
+
+          {/* Submenu items */}
+          {!collapsed && isExpanded && (
+            <div className={level === 0 ? '!bg-white' : '!bg-white'}>
+              {item.children.map((child: any) => renderMenuItem(child, level + 1))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Leaf menu item without children
+    const leafIsActive = level === 0 && location.pathname === item.to;
+    
+    return (
+      <Link
+        to={item.to}
+        key={item.label}
+        className={`no-underline group relative flex items-center ${paddingLeft} py-3 text-left transition-all duration-200 hover:bg-blue-50 ${
+          leafIsActive ? 'bg-[#EFF6FF] border-r-4 border-blue-500' : ''
+        }`}
+      >
+        {/* Icon - only show for top level */}
+        {level === 0 && (
+          <div
+            className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-200 ${
+              leafIsActive
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
+            }`}
+          >
+            <span className="text-lg flex items-center justify-center">{item.icon}</span>
+          </div>
+        )}
+
+        {/* Content */}
+        {!collapsed && (
+          <div className={`${level === 0 ? 'ml-4' : ''} flex-1`}>
+            <div
+              className={`font-medium ${level === 0 ? 'text-[1rem]' : 'text-sm  !font-400'} transition-colors duration-200 ${
+                leafIsActive ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
+              }`}
+            >
+              {item.label}
+            </div>
+            <div className="text-xs text-gray-500 mt-0.5 leading-tight">
+              {item.desc}
+            </div>
+          </div>
+        )}
+      </Link>
+    );
+  };
 
   return (
     <aside
       className="min-h-screen bg-white flex flex-col transition-all duration-300 relative"
       style={{
-        width: collapsed ? 64 : 288,
+        width: collapsed ? 64 : 268,
         borderRight: '1px solid #e5e7eb',
       }}
       onMouseEnter={() => setHovered(true)}
@@ -93,110 +232,7 @@ export default function AdminSideBar() {
     >
       {/* Navigation */}
       <nav className="flex-1 py-4">
-        {adminMenu.map((item) => {
-  const isActive =
-    item.to === '/admin'
-      ? location.pathname === '/admin'
-      : location.pathname.startsWith(item.to);
-
-  const isDocumentManager = item.label === 'Quản lý tài liệu';
-
-  return (
-    <div key={item.label}>
-      <Link
-        to={item.to}
-        className={`no-underline group relative flex items-center px-2 py-4 text-left transition-all duration-200 hover:bg-blue-50 ${
-          isActive ? 'bg-blue-50 border-r-4 border-blue-500' : ''
-        }`}
-        onClick={(e) => {
-          if (isDocumentManager) {
-            e.preventDefault(); // prevent navigation
-            setOpenDropdown((prev) => !prev);
-          }
-        }}
-      >
-        {/* Icon */}
-        <div
-          className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-200 ${
-            isActive
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
-          }`}
-        >
-          <span className="text-lg flex items-center justify-center">{item.icon}</span>
-        </div>
-
-        {/* Content */}
-        {!collapsed && (
-          <div className="ml-4 flex-1 flex justify-between items-center">
-            <div
-              className={`font-medium text-[1rem] transition-colors duration-200 ${
-                isActive ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
-              }`}
-            >
-              {item.label}
-            </div>
-
-            {/* Dropdown arrow */}
-            {isDocumentManager && (
-              <svg
-                className={`w-4 h-4 transition-transform duration-200 ${
-                  openDropdown ? 'rotate-90' : ''
-                }`}
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M6 6L14 10L6 14V6Z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            )}
-          </div>
-        )}
-      </Link>
-
-      {/* Submenu */}
-      {isDocumentManager && openDropdown && !collapsed && (
-        <div className="ml-16 mt-2 space-y-2">
-          {/* Các link tĩnh */}
-          <Link to="/admin/documents" className="text-sm text-gray-600 hover:text-blue-600 block">
-            Tài liệu nội bộ
-          </Link>
-          <Link to="/admin/reports" className="text-sm text-gray-600 hover:text-blue-600 block">
-            Báo cáo
-          </Link>
-          {/* Render nguyên thẻ SidebarItem với dữ liệu mẫu */}
-          <div>
-            {processList.map((item, idx) => (
-              <div
-                key={item.id}
-                className={`flex items-center px-2 py-2 rounded-lg cursor-pointer transition-all duration-200 ${
-                  selectedItem === item.id
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-700 hover:bg-blue-50'
-                }`}
-                onClick={() => {
-                  setSelectedItem(item.id);
-                  setSelectedTitle(item.title);
-                }}
-              >
-                <div className="flex-1">{item.title}</div>
-                {openIndex === idx ? (
-                  <FaAngleDoubleLeft className="w-4 h-4" />
-                ) : (
-                  <FaAngleDoubleRight className="w-4 h-4" />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-})}
-
+        {adminMenu.map((item) => renderMenuItem(item))}
       </nav>
 
       {/* Footer */}
@@ -232,9 +268,10 @@ export default function AdminSideBar() {
         style={{
           position: 'fixed',
           bottom: 24,
-          left: collapsed ? 16 : 288 - 48, // 48 = button width + margin
+          left: collapsed ? 16 : 268 - 48, // 48 = button width + margin
           width: 40,
           height: 40,
+          cursor: 'pointer',
           background: 'white',
           boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
           border: '1px solid #e5e7eb',
