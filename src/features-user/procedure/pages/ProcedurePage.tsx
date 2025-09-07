@@ -60,20 +60,18 @@ const stepContents = [
       {
         thanhPhan: "Vé máy bay khứ hồi",
         donGia: 2000000,
-        dinhMuc: 1,
-        soLuong: 1,
+        soLuong: 2,
         luuY: "Hạng phổ thông",
       },
       {
         thanhPhan: "Khách sạn",
         donGia: 1000000,
-        dinhMuc: 3,
         soLuong: 1,
         luuY: "3 sao trở lên",
       },
     ],
     tableHeaders: [
-      "Thành phần", "Đơn giá", "Định mức", "Số lượng", "Thành tiền", "Ghi chú"
+      "Thành phần", "Đơn giá/Định mức", "Số lượng", "Thành tiền", "Ghi chú"
     ],
     tableType: "full"
   },
@@ -196,7 +194,7 @@ export default function ProcedurePage() {
           <thead className="bg-blue-600 text-white">
             <tr>
               {stepData.tableHeaders.map((header: string, idx: number) => (
-                <th key={idx} className="p-2 border text-left">{header}</th>
+                <th key={idx} className="p-2 border text-center">{header}</th>
               ))}
             </tr>
           </thead>
@@ -208,10 +206,9 @@ export default function ProcedurePage() {
                 {stepData.tableType === "full" ? (
                   <>
                     <td className="p-2 border">{row.donGia?.toLocaleString()}</td>
-                    <td className="p-2 border">{row.dinhMuc}</td>
                     <td className="p-2 border">{row.soLuong}</td>
                     <td className="p-2 border">
-                      {((row.donGia || 0) * (row.dinhMuc || 0) * (row.soLuong || 0)).toLocaleString()}
+                      {((row.donGia || 0) * (row.soLuong || 0)).toLocaleString()}
                     </td>
                     <td className="p-2 border">{row.luuY}</td>
                   </>
