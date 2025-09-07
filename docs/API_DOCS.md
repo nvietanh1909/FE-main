@@ -68,7 +68,6 @@
             "column": "string",
           }
         ],
-        "tableHeaders": ["string"]
       }
     ]
   }
