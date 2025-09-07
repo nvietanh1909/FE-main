@@ -308,52 +308,10 @@ export default function DashboardPage() {
           )}
           {searchTab === 1 && (
             <Box sx={{ mx: 'auto', background: '#fff', borderRadius: 3, border: '1px solid #e5e7eb', p: 3, mt: 2 }}>
-              <Typography variant="h5" fontWeight={700} align="center" mb={1}>
+              <Typography variant="h5" fontWeight={700} align="left" mb={1}>
                 Tìm kiếm tài liệu
               </Typography>
-              <Typography variant="body2" color="text.secondary" align="center" mb={2}>
-                Sử dụng tìm kiếm thông thường hoặc tìm kiếm thông minh
-              </Typography>
-              <Box sx={{ display: 'flex', background: '#F3F4F6', borderRadius: 1.2, mb: 2, overflow: 'hidden' }}>
-                <Button
-                  startIcon={<Search />}
-                  onClick={() => setSearchMode(0)}
-                  sx={{
-                    flex: 1,
-                    background: searchMode === 0 ? '#2563eb' : '#f5f6fa',
-                    color: searchMode === 0 ? '#fff' : '#222',
-                    fontWeight: 600,
-                    borderRadius: 0,
-                    boxShadow: 'none',
-                    textTransform: 'none',
-                    fontSize: 14,
-                    px: 1.5,
-                    py: 1,
-                    '&:hover': { background: searchMode === 0 ? '#2563eb' : '#e5e7eb' },
-                  }}
-                >
-                  Tìm kiếm thông thường
-                </Button>
-                <Button
-                  startIcon={<FlashOnIcon />}
-                  onClick={() => setSearchMode(1)}
-                  sx={{
-                    flex: 1,
-                    background: searchMode === 1 ? '#2563eb' : '#f5f6fa',
-                    color: searchMode === 1 ? '#fff' : '#222',
-                    fontWeight: 600,
-                    borderRadius: 0,
-                    boxShadow: 'none',
-                    textTransform: 'none',
-                    fontSize: 14,
-                    px: 1.5,
-                    py: 1,
-                    '&:hover': { background: searchMode === 1 ? '#2563eb' : '#e5e7eb' },
-                  }}
-                >
-                  Tìm kiếm thông minh
-                </Button>
-              </Box>
+              
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, background: '#fff', borderRadius: 2, border: '1px solid #E5E7EB', px: 1, py: 0.5 }}>
                 <InputBase
                   placeholder="Mô tả nội dung bạn cần tìm"
