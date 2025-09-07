@@ -42,7 +42,7 @@ export default function Header() {
 
     return (
         <header 
-            className="bg-white shadow-sm h-[5.3rem] flex items-center justify-center font-roboto"
+            className="bg-white shadow-sm h-[4rem] flex items-center justify-center font-roboto"
             style={{ borderBottom: '1px solid #e5e7eb' }}
         >
             <div className="mx-auto px-4 sm:px-6 lg:px-8 w-full">

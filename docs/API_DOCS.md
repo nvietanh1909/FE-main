@@ -11,7 +11,7 @@ Sử dụng JWT Token authentication
 ### 1.1 Login
 **POST** `/auth/login`
 
-**Request Body:**
+**:star: Request Body:**
 ```json
 {
   "email": "string",
