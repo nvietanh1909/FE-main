@@ -8,6 +8,8 @@ import { FaHome, FaClock, FaFileAlt } from 'react-icons/fa';
 import nprogress from 'nprogress';
 import ProcedureStepper from '@/features-admin/document/components/ProcedureStepper.tsx';
 import ChatBot from '@/components/ChatBot.tsx';
+import { useNProgress } from "@/hooks/useNProgress.ts";
+
 // ====== Data for processes ======
 type ProcessItem = {
   id: string;
@@ -143,13 +145,11 @@ export default function ProcedurePage() {
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [selectedTitle, setSelectedTitle] = useState<string>("");
   const [activeStep, setActiveStep] = useState(0);
+  const { startProgress, doneProgress } = useNProgress();
 
-  nprogress.configure({ showSpinner: false });
-  nprogress.start();
 
   useEffect(() => {
-    nprogress.done();
-    
+    startProgress();
     const params = new URLSearchParams(location.search);
     const processId = params.get('process');
     const itemId = params.get('item');
@@ -169,6 +169,7 @@ export default function ProcedurePage() {
       setSelectedTitle("");
       setActiveStep(0);
     }
+    doneProgress();
   }, [location.search]);
 
   // Render table function

@@ -9,7 +9,7 @@ import remarkGfm from "remark-gfm";
 import "../assets/styles/chatbot.css";
 
 // RAG Service
-class RAGService {
+class RAGService { 
   private baseUrl = "https://umentor.duckdns.org/api";
   
   async queryRAG(message: string, context: string): Promise<string> {
