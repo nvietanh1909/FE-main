@@ -1,5 +1,5 @@
 export function getToken() {
-    return sessionStorage.getItem('token') || localStorage.getItem('token');
+    return sessionStorage.getItem('islogined') || localStorage.getItem('islogined');
 }
 
 export function isAuthenticated() {
@@ -7,9 +7,11 @@ export function isAuthenticated() {
 }
 
 export function logout() {
+    sessionStorage.removeItem('islogined');
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('isRemember');
     localStorage.removeItem('token');
+    localStorage.removeItem('islogined');
     localStorage.removeItem('isRemember');
 }
 

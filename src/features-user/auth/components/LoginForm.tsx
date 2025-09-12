@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import nprogress from "nprogress";
@@ -22,12 +22,13 @@ export default function LoginForm() {
     const { register, handleSubmit, formState: { errors }, watch } = useForm<LoginFormInput>();
     const [error, setError] = useState<string>("");
     const [isRemember, setIsRemember] = useState<boolean>(false);
+    const [isloginSucess, setIsloginSucess] = useState<boolean>(false);
     const [userName, setUserName] = useState<string>("");
     const navigate = useNavigate();
     nprogress.start();
 
     useEffect(() => {
-        const isAuthenticated = sessionStorage.getItem('token') === 'true';
+        const isAuthenticated = sessionStorage.getItem('islogined') === 'true' || localStorage.getItem('islogined') === 'true';
         if (isAuthenticated) {
             navigate('/', { replace: true });
         }
@@ -35,20 +36,33 @@ export default function LoginForm() {
 
     nprogress.done();
 
+
     const onSubmit = async (data: LoginFormInput) => {
         console.log(data);
         nprogress.start();
         try {
-            if(data.email === "user" && data.password === "123"){
-                // gọi api ở đây 
-                
-                sessionStorage.setItem('user', JSON.stringify({ name: "test" }));
-                sessionStorage.setItem('token', 'true');
-                sessionStorage.setItem('isRemember', isRemember.toString());
-                navigate("/");
-            } else {
-                setError("Email hoặc mật khẩu không chính xác");
-                nprogress.done();
+            const response = await fetch("https://umentor.duckdns.org/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                throw new Error("Login failed");
+            }
+
+            const result = await response.json();
+            console.log(result);
+
+            if (result.success) {
+                setIsloginSucess(true);
+                setUserName(result.data.user.email);
+                sessionStorage.setItem('islogined', 'true');
+                sessionStorage.setItem('token', result.data.token);
+                sessionStorage.setItem('userName', result.data.user.name);
+                sessionStorage.setItem('userEmail', result.data.user.email);
             }
         } catch (error) {
             nprogress.done();
