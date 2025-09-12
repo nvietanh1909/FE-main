@@ -50,7 +50,8 @@ export default function LoginForm() {
             });
 
             if (!response.ok) {
-                throw new Error("Login failed");
+                setError("Email hoặc mật khẩu không chính xác");
+                nprogress.done();
             }
 
             const result = await response.json();
@@ -61,8 +62,10 @@ export default function LoginForm() {
                 setUserName(result.data.user.email);
                 sessionStorage.setItem('islogined', 'true');
                 sessionStorage.setItem('token', result.data.token);
+                localStorage.setItem('token', result.data.token);
                 sessionStorage.setItem('userName', result.data.user.name);
                 sessionStorage.setItem('userEmail', result.data.user.email);
+                navigate('/', { replace: true });
             }
         } catch (error) {
             nprogress.done();

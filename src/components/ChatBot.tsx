@@ -11,24 +11,27 @@ import "../assets/styles/chatbot.css";
 // RAG Service
 class RAGService {
   private baseUrl = "https://umentor.duckdns.org/api";
-
-  async queryRAG(query: string, filename?: string): Promise<string> {
+  
+  async queryRAG(message: string, context: string): Promise<string> {
     try {
-      const response = await fetch(`${this.baseUrl}/chatbot/ask`, {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const response = await fetch('https://umentor.duckdns.org/api/chatbot/ask', {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "accept": "application/json",
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          query: query,
-          filename: filename || "",
+          message: message,
+          context: context
         }),
       });
-
+  
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
+  
       const result = await response.json();
       return result.response;
     } catch (error) {
@@ -42,10 +45,14 @@ class RAGService {
     filename?: string,
     onChunk?: (chunk: string) => void
   ): Promise<void> {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     const response = await fetch(`${this.baseUrl}/chatbot/ask`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query, filename: filename || "" }),
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}`, },
+      body: JSON.stringify({
+        message: query,
+        context: ""
+      }),
     });
 
     if (!response.body) {
