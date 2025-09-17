@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchProcedures } from '../services/procedureService';
+import { fetchProcedures } from '@/features-user/procedure/services/procedureService.ts';
 import { FaCog, FaComments, FaAngleDoubleLeft, FaAngleDoubleRight, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { MdOutlineContentPasteSearch, MdDashboard } from "react-icons/md";
 import { Link, useLocation } from 'react-router-dom';

@@ -71,6 +71,7 @@ function App() {
           <Route path="procedures" element={<ProcedurePage />} />
           <Route path="messages" element={<MessagePage />} />
           <Route path="settings" element={<SettingPage />} />
+          <Route path="procedures/:id" element={<ProcedurePage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
 
