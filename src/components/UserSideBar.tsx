@@ -1,82 +1,174 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaCog, FaComments, FaAngleDoubleLeft, FaAngleDoubleRight, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { MdOutlineContentPasteSearch, MdDashboard } from "react-icons/md";
 import { Link, useLocation } from 'react-router-dom';
 
-const menu = [
-  {
-    label: 'Bảng điều khiển',
-    desc: 'Tổng quan hệ thống',
-    icon: <MdDashboard />,
-    to: '/',
-  },
-  {
-    label: 'Tra cứu thủ tục',
-    desc: 'Quy trình và thủ tục thanh toán',
-    icon: <MdOutlineContentPasteSearch />,
-    to: '/procedures',
-    children: [
-      {
-        label: 'Quy trình thanh toán hoạt động thường xuyên',
-        to: '/procedures?category=payment',
-        children: [
-          {
-            label: '1. Công tác phí trong nước',
-            to: '/procedures?process=p1&item=p1c1',
-          },
-          {
-            label: '2. Công tác phí nước ngoài',
-            to: '/procedures?process=p1&item=p1c2',
-          },
-          {
-            label: '3. Hội nghị, hội thảo trong nước',
-            to: '/procedures?process=p1&item=p1c3',
-          },
-          {
-            label: '4. Hội nghị, hội thảo quốc tế tại Việt Nam',
-            to: '/procedures?process=p1&item=p1c4',
-          }
-        ]
-      },
-      {
-        label: 'Quy trình mua sắm trang thiết bị',
-        to: '/procedures?category=procurement',
-        children: [
-          {
-            label: '1. Mua máy tính',
-            to: '/procedures?process=p2&item=p2c1',
-          },
-          {
-            label: '2. Mua bàn ghế',
-            to: '/procedures?process=p2&item=p2c2',
-          },
-          {
-            label: '3. Mua vật tư tiêu hao',
-            to: '/procedures?process=p2&item=p2c3',
-          }
-        ]
-      }
-    ],
-  },
-  {
-    label: 'Tin nhắn',
-    desc: 'Hỗ trợ và trao đổi',
-    icon: <FaComments />,
-    to: '/messages',
-  },
-  {
-    label: 'Cài đặt',
-    desc: 'Cấu hình tài khoản',
-    icon: <FaCog />,
-    to: '/settings',
-  },
-];
+// const menu = [
+//   {
+//     label: 'Bảng điều khiển',
+//     desc: 'Tổng quan hệ thống',
+//     icon: <MdDashboard />,
+//     to: '/',
+//   },
+//   {
+//     label: 'Tra cứu thủ tục',
+//     desc: 'Quy trình và thủ tục thanh toán',
+//     icon: <MdOutlineContentPasteSearch />,
+//     to: '/procedures',
+//     children: [
+//       {
+//         label: 'Quy trình thanh toán hoạt động thường xuyên',
+//         to: '/procedures?category=payment',
+//         children: [
+//           {
+//             label: '1. Công tác phí trong nước',
+//             to: '/procedures?process=p1&item=p1c1',
+//           },
+//           {
+//             label: '2. Công tác phí nước ngoài',
+//             to: '/procedures?process=p1&item=p1c2',
+//           },
+//           {
+//             label: '3. Hội nghị, hội thảo trong nước',
+//             to: '/procedures?process=p1&item=p1c3',
+//           },
+//           {
+//             label: '4. Hội nghị, hội thảo quốc tế tại Việt Nam',
+//             to: '/procedures?process=p1&item=p1c4',
+//           }
+//         ]
+//       },
+//       {
+//         label: 'Quy trình mua sắm trang thiết bị',
+//         to: '/procedures?category=procurement',
+//         children: [
+//           {
+//             label: '1. Mua máy tính',
+//             to: '/procedures?process=p2&item=p2c1',
+//           },
+//           {
+//             label: '2. Mua bàn ghế',
+//             to: '/procedures?process=p2&item=p2c2',
+//           },
+//           {
+//             label: '3. Mua vật tư tiêu hao',
+//             to: '/procedures?process=p2&item=p2c3',
+//           }
+//         ]
+//       }
+//     ],
+//   },
+//   {
+//     label: 'Tin nhắn',
+//     desc: 'Hỗ trợ và trao đổi',
+//     icon: <FaComments />,
+//     to: '/messages',
+//   },
+//   {
+//     label: 'Cài đặt',
+//     desc: 'Cấu hình tài khoản',
+//     icon: <FaCog />,
+//     to: '/settings',
+//   },
+// ];
 
 export default function UserSideBar() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
+  const [menu, setMenu] = useState<any[]>([]);
+
+    useEffect(() => {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+    fetch('https://umentor.duckdns.org/api/dashboard/procedures', {
+      headers: {
+        'accept': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          // lọc chỉ các item có parent chứa "Thanh toán hoạt động thường xuyên"
+          const filteredItems = data.data.filter(
+            (item: any) =>
+              item.parent &&
+              item.parent.toLowerCase().includes("thanh toán hoạt động thường xuyên".toLowerCase())
+          );
+
+          const dynamicMenu = [
+            {
+              label: 'Bảng điều khiển',
+              desc: 'Tổng quan hệ thống',
+              icon: <MdDashboard />,
+              to: '/',
+            },
+            {
+              label: 'Tra cứu thủ tục',
+              desc: 'Quy trình và thủ tục thanh toán',
+              icon: <MdOutlineContentPasteSearch />,
+              to: '/procedures',
+              children: [
+                {
+                  label: 'Quy trình thanh toán hoạt động thường xuyên',
+                  to: '/procedures?category=payment',
+                  children: filteredItems.map((item: any, idx: number) => ({
+                    label: `${idx + 1}. ${item.title}`,
+                    to: `/procedures/${item.id}`
+                  }))
+                }
+              ]
+            },
+            {
+              label: 'Tin nhắn',
+              desc: 'Hỗ trợ và trao đổi',
+              icon: <FaComments />,
+              to: '/messages',
+            },
+            {
+              label: 'Cài đặt',
+              desc: 'Cấu hình tài khoản',
+              icon: <FaCog />,
+              to: '/settings',
+            }
+          ];
+
+          setMenu(dynamicMenu);
+        }
+      })
+      .catch(() => {
+        // fallback nếu lỗi API
+        setMenu([
+          {
+            label: 'Bảng điều khiển',
+            desc: 'Tổng quan hệ thống',
+            icon: <MdDashboard />,
+            to: '/',
+          },
+          {
+            label: 'Tra cứu thủ tục',
+            desc: 'Quy trình và thủ tục thanh toán',
+            icon: <MdOutlineContentPasteSearch />,
+            to: '/procedures',
+            children: []
+          },
+          {
+            label: 'Tin nhắn',
+            desc: 'Hỗ trợ và trao đổi',
+            icon: <FaComments />,
+            to: '/messages',
+          },
+          {
+            label: 'Cài đặt',
+            desc: 'Cấu hình tài khoản',
+            icon: <FaCog />,
+            to: '/settings',
+          }
+        ]);
+      });
+  }, []);
 
   const toggleSubmenu = (label: string) => {
     setExpandedMenus(prev => 
