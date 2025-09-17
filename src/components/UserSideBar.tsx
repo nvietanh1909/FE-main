@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { fetchProcedures } from '../services/procedureService';
 import { FaCog, FaComments, FaAngleDoubleLeft, FaAngleDoubleRight, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { MdOutlineContentPasteSearch, MdDashboard } from "react-icons/md";
 import { Link, useLocation } from 'react-router-dom';
@@ -79,24 +80,20 @@ export default function UserSideBar() {
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
   const [menu, setMenu] = useState<any[]>([]);
 
-    useEffect(() => {
+  useEffect(() => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
-    fetch('https://umentor.duckdns.org/api/dashboard/procedures', {
-      headers: {
-        'accept': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    })
-      .then(res => res.json())
+    fetchProcedures(token)
       .then(data => {
         if (data.success) {
           // lọc chỉ các item có parent chứa "Thanh toán hoạt động thường xuyên"
-          const filteredItems = data.data.filter(
-            (item: any) =>
-              item.parent &&
-              item.parent.toLowerCase().includes("thanh toán hoạt động thường xuyên".toLowerCase())
-          );
+          const filteredItems = data.data.filter((item: any) => {
+            const parent = item?.parent ?? '';
+            return parent
+              .toLowerCase()
+              .normalize('NFC')
+              .includes("thanh toán hoạt động thường xuyên".toLowerCase().normalize('NFC'));
+          });
 
           const dynamicMenu = [
             {
@@ -171,8 +168,8 @@ export default function UserSideBar() {
   }, []);
 
   const toggleSubmenu = (label: string) => {
-    setExpandedMenus(prev => 
-      prev.includes(label) 
+    setExpandedMenus(prev =>
+      prev.includes(label)
         ? prev.filter(item => item !== label)
         : [...prev, label]
     );
@@ -185,7 +182,7 @@ export default function UserSideBar() {
         ? location.pathname === '/'
         : location.pathname.startsWith(item.to)
     ) : false;
-    
+
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedMenus.includes(item.label);
     const paddingLeft = level === 0 ? 'px-2' : level === 1 ? 'pl-16 pr-2' : 'pl-20 pr-2';
@@ -195,19 +192,17 @@ export default function UserSideBar() {
         <div key={item.label}>
           {/* Parent menu item */}
           <div
-            className={`group relative flex items-center ${paddingLeft} py-4 text-left transition-all duration-200 hover:bg-blue-50 cursor-pointer ${
-              isActive ? 'bg-blue-50 border-r-4 border-blue-500' : ''
-            }`}
+            className={`group relative flex items-center ${paddingLeft} py-4 text-left transition-all duration-200 hover:bg-blue-50 cursor-pointer ${isActive ? 'bg-blue-50 border-r-4 border-blue-500' : ''
+              }`}
             onClick={() => toggleSubmenu(item.label)}
           >
             {/* Icon - only show for top level */}
             {level === 0 && (
               <div
-                className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-200 ${
-                  isActive
+                className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-200 ${isActive
                     ? 'bg-blue-500 text-white'
                     : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
-                }`}
+                  }`}
               >
                 <span className="text-lg flex items-center justify-center">{item.icon}</span>
               </div>
@@ -217,9 +212,8 @@ export default function UserSideBar() {
             {!collapsed && (
               <div className={`${level === 0 ? 'ml-4' : ''} flex-1`}>
                 <div
-                  className={`font-medium ${level === 0 ? 'text-[1rem]' : 'text-sm'} transition-colors duration-200 ${
-                    isActive ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
-                  }`}
+                  className={`font-medium ${level === 0 ? 'text-[1rem]' : 'text-sm'} transition-colors duration-200 ${isActive ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
+                    }`}
                 >
                   {item.label}
                 </div>
@@ -238,60 +232,74 @@ export default function UserSideBar() {
           </div>
 
           {/* Submenu items */}
-          {!collapsed && isExpanded && (
-            <div className={level === 0 ? '!bg-white' : '!bg-white'}>
-              {item.children.map((child: any) => renderMenuItem(child, level + 1))}
-            </div>
-          )}
+          {!collapsed && isExpanded && (() => {
+            // Nếu là menu con của 'Quy trình thanh toán hoạt động thường xuyên' và có nhiều hơn 5 item thì cho scroll toàn bộ
+            const isHoatDong = item.label === 'Quy trình thanh toán hoạt động thường xuyên' && item.children && item.children.length > 5;
+            const scrollStyle: React.CSSProperties = isHoatDong ? { maxHeight: 240, overflowY: 'auto' } : {};
+            return (
+              <div className={level === 0 ? '!bg-white' : '!bg-white'} style={scrollStyle}>
+                {item.children.map((child: any) => renderMenuItem(child, level + 1))}
+              </div>
+            );
+          })()}
         </div>
       );
     }
 
     // Leaf menu item without children
-    const leafIsActive = level === 0 && location.pathname === item.to;
-    
-    return (
-      <Link
-        to={item.to}
-        key={item.label}
-        className={`no-underline group relative flex items-center ${paddingLeft} py-3 text-left transition-all duration-200 hover:bg-blue-50 ${
-          leafIsActive ? 'bg-[#EFF6FF] border-r-4 border-blue-500' : ''
-        }`}
-      >
-        {/* Icon - only show for top level */}
-        {level === 0 && (
-          <div
-            className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-200 ${
-              leafIsActive
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
-            }`}
-          >
-            <span className="text-lg flex items-center justify-center">{item.icon}</span>
-          </div>
-        )}
+    const leafIsActive = location.pathname === item.to;
 
-        {/* Content */}
-        {!collapsed && (
-          <div className={`${level === 0 ? 'ml-4' : ''} flex-1`}>
+    // Nếu có item.to thì cho click, nếu không thì chỉ render text
+    if (item.to) {
+      return (
+        <Link
+          to={item.to}
+          key={item.label}
+          className={`no-underline group relative flex items-center ${paddingLeft} py-3 text-left transition-all duration-200 hover:bg-blue-50 ${leafIsActive ? 'bg-[#EFF6FF] border-r-4 border-blue-500' : ''}`}
+        >
+          {/* Icon - only show for top level */}
+          {level === 0 && (
             <div
-              className={`font-medium ${level === 0 ? 'text-[1rem]' : 'text-sm  !font-400'} transition-colors duration-200 ${
-                leafIsActive ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'
-              }`}
+              className={`flex items-center justify-center w-10 h-10 rounded-xl transition-colors duration-200 ${leafIsActive
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
+                }`}
             >
-              {item.label}
+              <span className="text-lg flex items-center justify-center">{item.icon}</span>
             </div>
-            <div className="text-xs text-gray-500 mt-0.5 leading-tight">
-              {item.desc}
+          )}
+
+          {/* Content */}
+          {!collapsed && (
+            <div className={`${level === 0 ? 'ml-4' : ''} flex-1`}>
+              <div
+                className={`font-medium ${level === 0 ? 'text-[1rem]' : 'text-sm  !font-400'} transition-colors duration-200 ${leafIsActive ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'}`}
+              >
+                {item.label}
+              </div>
+              <div className="text-xs text-gray-500 mt-0.5 leading-tight">
+                {item.desc}
+              </div>
             </div>
-          </div>
-        )}
-      </Link>
-    );
+          )}
+        </Link>
+      );
+    } else {
+      // Không có đường dẫn, chỉ render text
+      return (
+        <div key={item.label} className={`flex items-center ${paddingLeft} py-3 text-left`}>
+          {!collapsed && (
+            <div className={`${level === 0 ? 'ml-4' : ''} flex-1`}>
+              <div className={`font-medium ${level === 0 ? 'text-[1rem]' : 'text-sm  !font-400'}`}>{item.label}</div>
+            </div>
+          )}
+        </div>
+      );
+    }
   };
-  
+
   return (
-    <aside 
+    <aside
       className="min-h-screen bg-white flex flex-col transition-all duration-300 relative"
       style={{
         width: collapsed ? 64 : 268,
