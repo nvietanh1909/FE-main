@@ -10,6 +10,7 @@ import Button from "@mui/material/Button";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { SwitchIOS } from "@/components/switch/SwitchIOS.tsx";
+import { useNProgress } from "@/hooks/useNProgress.ts";
 
 
 type LoginFormInput = {
@@ -24,8 +25,10 @@ export default function LoginForm() {
     const [isRemember, setIsRemember] = useState<boolean>(false);
     const [isloginSucess, setIsloginSucess] = useState<boolean>(false);
     const [userName, setUserName] = useState<string>("");
+    const { startProgress, doneProgress } = useNProgress();
+
     const navigate = useNavigate();
-    nprogress.start();
+    
 
     useEffect(() => {
         const isAuthenticated = sessionStorage.getItem('islogined') === 'true' || localStorage.getItem('islogined') === 'true';
@@ -34,12 +37,10 @@ export default function LoginForm() {
         }
     }, []);
 
-    nprogress.done();
 
 
     const onSubmit = async (data: LoginFormInput) => {
-        console.log(data);
-        nprogress.start();
+        startProgress();
         try {
             const response = await fetch("https://umentor.duckdns.org/api/auth/login", {
                 method: "POST",
@@ -51,11 +52,9 @@ export default function LoginForm() {
 
             if (!response.ok) {
                 setError("Email hoặc mật khẩu không chính xác");
-                nprogress.done();
             }
 
             const result = await response.json();
-            console.log(result);
 
             if (result.success) {
                 setIsloginSucess(true);
@@ -68,11 +67,11 @@ export default function LoginForm() {
                 navigate('/', { replace: true });
             }
         } catch (error) {
-            nprogress.done();
             console.log("Error: " + error);
             alert("Có lỗi xảy ra khi đăng nhập!");
+            doneProgress();
         } finally {
-            nprogress.done();
+            doneProgress();
         }
     };
 

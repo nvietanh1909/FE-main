@@ -1,9 +1,10 @@
 export function getToken() {
-    return sessionStorage.getItem('islogined') || localStorage.getItem('islogined');
+    return sessionStorage.getItem('token') || localStorage.getItem('token');
 }
 
 export function isAuthenticated() {
-    return getToken() === 'true';
+    const token = getToken();
+    return token && token !== 'true' && token.length > 0;
 }
 
 export function logout() {
@@ -13,6 +14,10 @@ export function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('islogined');
     localStorage.removeItem('isRemember');
+}
+export function setToken(token: string) {
+    sessionStorage.setItem('token', token);
+    localStorage.setItem('token', token);
 }
 
 export function getUser() {
