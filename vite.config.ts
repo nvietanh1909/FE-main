@@ -12,5 +12,7 @@ export default defineConfig({
   },
   server: {
     allowedHosts: ['umentor.duckdns.org'],
+    host: '0.0.0.0',
+    port: 19100,
   },
 })
