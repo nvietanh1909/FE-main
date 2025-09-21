@@ -1,9 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import { Box, Paper, Chip, Divider, CircularProgress, Alert } from '@mui/material';
+import { Box, Paper, Chip, Divider, CircularProgress, Alert, Collapse, IconButton } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { FaHome, FaClock, FaFileAlt, FaInfoCircle, FaArrowLeft } from 'react-icons/fa';
 import nprogress from 'nprogress';
 import ProcedureStepper from '@/features-admin/document/components/ProcedureStepper.tsx';
@@ -58,6 +61,54 @@ const steps = [
 ];
 
 export default function ProcedurePage() {
+  // Bảng tài liệu cần chuẩn bị cho bước 2
+  const renderTaiLieuTable = () => {
+    if (!procedureData?.hosochungtus || procedureData.hosochungtus.length === 0) return null;
+    return (
+      <Box
+        sx={{
+          mt: 3,
+          px: 4,
+          py: 2,
+          borderRadius: 2,
+          backgroundColor: "#ffffffff",
+          border: "1px solid #e5e7eb",
+        }}
+      >
+        <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
+          TÀI LIỆU CẦN CHUẨN BỊ
+        </Typography>
+        <table className="w-full border border-gray-300">
+          <thead className="bg-blue-600 text-white">
+            <tr>
+              <th className="p-2 border text-center">STT</th>
+              <th className="p-2 border text-center">Hồ sơ</th>
+              <th className="p-2 border text-center">Số lượng</th>
+              <th className="p-2 border text-center">Mẫu</th>
+              <th className="p-2 border text-center">Chú ý</th>
+            </tr>
+          </thead>
+          <tbody>
+            {procedureData.hosochungtus.map((doc, idx) => (
+              <tr key={`${doc.id}-${idx}`}> 
+                <td className="p-2 border text-center">{idx + 1}</td>
+                <td className="p-2 border">{doc.name}</td>
+                <td className="p-2 border">
+                  <input type="number" min={0} style={{ width: 60, padding: 4, border: '1px solid #e5e7eb', borderRadius: 4 }} />
+                </td>
+                <td className="p-2 border text-center">
+                  {doc.path ? (
+                    <a href={doc.path} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Tải mẫu</a>
+                  ) : ''}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Box>
+    );
+  };
+  const [showDocuments, setShowDocuments] = useState(false);
   const location = useLocation();
   const params = useParams();
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
@@ -144,27 +195,51 @@ export default function ProcedurePage() {
         <table className="w-full border border-gray-300">
           <thead className="bg-blue-600 text-white">
             <tr>
-              <th className="p-2 border text-center">ID</th>
+              <th className="p-2 border text-center">STT</th>
               <th className="p-2 border text-center">Tên thành phần</th>
-              <th className="p-2 border text-center">Mô tả</th>
-              <th className="p-2 border text-center">Loại</th>
+              <th className="p-2 border text-center">Số lượng</th>
+              <th className="p-2 border text-center">Đơn giá/Định mức</th>
+              <th className="p-2 border text-center">Thành tiền</th>
+              <th className="p-2 border text-center">Ghi chú</th>
             </tr>
           </thead>
           <tbody>
-            {procedureData.thanhphandutoans.map((item, idx) => (
-              <tr key={`${item.id}-${idx}`}>
-                <td className="p-2 border">{item.id}</td>
-                <td className="p-2 border font-medium">{item.name}</td>
-                <td className="p-2 border">{item.description}</td>
-                <td className="p-2 border">
-                  <Chip 
-                    label={item.type === 'domestic' ? 'Trong nước' : 'Quốc tế'} 
-                    size="small" 
-                    color={item.type === 'domestic' ? 'primary' : 'secondary'}
-                  />
-                </td>
-              </tr>
-            ))}
+            {procedureData.thanhphandutoans.map((item, idx) => {
+              // Lấy số lượng và đơn giá từ input nếu có, nếu không lấy từ item
+              const soLuong = item.soLuong !== undefined && item.soLuong !== null && item.soLuong !== '' ? Number(item.soLuong) : undefined;
+              const donGia = item.donGia !== undefined && item.donGia !== null && item.donGia !== '' ? Number(item.donGia) : undefined;
+              const thanhTien = soLuong !== undefined && donGia !== undefined ? soLuong * donGia : undefined;
+              return (
+                <tr key={`${item.id}-${idx}`}>
+                  <td className="p-2 border text-center">{idx + 1}</td>
+                  <td className="p-2 border font-medium">{item.name}</td>
+                  <td className="p-2 border">
+                    <input
+                      type="number"
+                      min={0}
+                      defaultValue={item.soLuong || ''}
+                      style={{ width: 70, padding: 4, border: '1px solid #e5e7eb', borderRadius: 4 }}
+                    />
+                  </td>
+                  <td className="p-2 border">
+                    <input
+                      type="number"
+                      min={0}
+                      defaultValue={item.donGia || ''}
+                      style={{ width: 100, padding: 4, border: '1px solid #e5e7eb', borderRadius: 4 }}
+                    />
+                  </td>
+                  <td className="p-2 border text-right">{(soLuong !== undefined && donGia !== undefined) ? thanhTien.toLocaleString() : ''}</td>
+                  <td className="p-2 border">
+                    <Chip 
+                      label={item.type === 'domestic' ? 'Trong nước' : 'Quốc tế'} 
+                      size="small" 
+                      color={item.type === 'domestic' ? 'primary' : 'secondary'}
+                    />
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </Box>
@@ -177,9 +252,6 @@ export default function ProcedurePage() {
 
     return (
       <Box sx={{ mt: 3 }}>
-        <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-          Hồ sơ chứng từ cần thiết:
-        </Typography>
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 3 }}>
           {procedureData.hosochungtus.map((doc, idx) => (
             <Chip
@@ -311,19 +383,38 @@ export default function ProcedurePage() {
                   </Box>
                   <Divider sx={{ mb: 2 }} />
 
-                  {/* Procedure Description */}
-                  <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-                    Mô tả thủ tục:
-                  </Typography>
-                  <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.6 }}>
-                    {procedureData.description}
-                  </Typography>
+                  {/* Procedure Description: chỉ hiện ở bước 1, 2 */}
+                  {(activeStep === 0 || activeStep === 1) && (
+                    <>
+                      <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
+                        Mô tả thủ tục:
+                      </Typography>
+                      <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.6 }}>
+                        {procedureData.description}
+                      </Typography>
+                    </>
+                  )}
 
-                  {/* Documents section */}
-                  {renderDocuments()}
+                  {/* Documents section (step 2, collapsible) */}
+                  {activeStep === 1 && (
+                    <Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                        <Typography variant="h6" fontWeight={600} sx={{ mb: 0, mr: 1 }}>
+                          Hồ sơ chứng từ cần thiết
+                        </Typography>
+                        <IconButton size="small" onClick={() => setShowDocuments((prev) => !prev)}>
+                          {showDocuments ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                        </IconButton>
+                      </Box>
+                      <Collapse in={showDocuments}>
+                        {renderDocuments()}
+                      </Collapse>
+                    </Box>
+                  )}
 
-                  {/* Table */}
-                  {renderThanhPhanTable()}
+                  {/* Table: chỉ hiện ở bước 1, 2 */}
+                  {activeStep === 1 && renderTaiLieuTable()}
+                  {activeStep === 0 && renderThanhPhanTable()}
 
                   {/* Notes section */}
                   {renderNotes()}
@@ -349,3 +440,4 @@ export default function ProcedurePage() {
     </div>
   );
 }
+
