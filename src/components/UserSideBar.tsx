@@ -81,90 +81,51 @@ export default function UserSideBar() {
   const [menu, setMenu] = useState<any[]>([]);
 
   useEffect(() => {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-
-    fetchProcedures(token)
-      .then(data => {
-        if (data.success) {
-          // lọc chỉ các item có parent chứa "Thanh toán hoạt động thường xuyên"
-          const filteredItems = data.data.filter((item: any) => {
-            const parent = item?.parent ?? '';
-            return parent
-              .toLowerCase()
-              .normalize('NFC')
-              .includes("thanh toán hoạt động thường xuyên".toLowerCase().normalize('NFC'));
-          });
-
-          const dynamicMenu = [
-            {
-              label: 'Bảng điều khiển',
-              desc: 'Tổng quan hệ thống',
-              icon: <MdDashboard />,
-              to: '/',
-            },
-            {
-              label: 'Tra cứu thủ tục',
-              desc: 'Quy trình và thủ tục thanh toán',
-              icon: <MdOutlineContentPasteSearch />,
-              to: '/procedures',
-              children: [
-                {
-                  label: 'Quy trình thanh toán hoạt động thường xuyên',
-                  to: '/procedures?category=payment',
-                  children: filteredItems.map((item: any, idx: number) => ({
-                    label: `${idx + 1}. ${item.title}`,
-                    to: `/procedures/${item.id}`
-                  }))
-                }
-              ]
-            },
-            {
-              label: 'Tin nhắn',
-              desc: 'Hỗ trợ và trao đổi',
-              icon: <FaComments />,
-              to: '/messages',
-            },
-            {
-              label: 'Cài đặt',
-              desc: 'Cấu hình tài khoản',
-              icon: <FaCog />,
-              to: '/settings',
-            }
-          ];
-
-          setMenu(dynamicMenu);
-        }
-      })
-      .catch(() => {
-        // fallback nếu lỗi API
-        setMenu([
+    // Tạo menu tĩnh đơn giản
+    const staticMenu = [
+      {
+        label: 'Bảng điều khiển',
+        desc: 'Tổng quan hệ thống',
+        icon: <MdDashboard />,
+        to: '/',
+      },
+      {
+        label: 'Tra cứu thủ tục',
+        desc: 'Quy trình và thủ tục thanh toán',
+        icon: <MdOutlineContentPasteSearch />,
+        to: '/procedures',
+        children: [
           {
-            label: 'Bảng điều khiển',
-            desc: 'Tổng quan hệ thống',
-            icon: <MdDashboard />,
-            to: '/',
-          },
-          {
-            label: 'Tra cứu thủ tục',
-            desc: 'Quy trình và thủ tục thanh toán',
-            icon: <MdOutlineContentPasteSearch />,
-            to: '/procedures',
-            children: []
-          },
-          {
-            label: 'Tin nhắn',
-            desc: 'Hỗ trợ và trao đổi',
-            icon: <FaComments />,
-            to: '/messages',
-          },
-          {
-            label: 'Cài đặt',
-            desc: 'Cấu hình tài khoản',
-            icon: <FaCog />,
-            to: '/settings',
+            label: 'Quy trình thanh toán hoạt động thường xuyên',
+            to: '/procedures?category=payment',
+            children: [
+              {
+                label: '1. Công tác phí trong nước',
+                to: '/procedures?type=trong-nuoc'
+              },
+              {
+                label: '2. Công tác phí nước ngoài',
+                to: '/procedures?type=nuoc-ngoai'
+              }
+            ]
           }
-        ]);
-      });
+        ]
+      },
+      {
+        label: 'Tin nhắn',
+        desc: 'Hỗ trợ và trao đổi',
+        icon: <FaComments />,
+        to: '/messages',
+      },
+      {
+        label: 'Cài đặt',
+        desc: 'Cấu hình tài khoản',
+        icon: <FaCog />,
+        to: '/settings',
+      }
+    ];
+
+    setMenu(staticMenu);
   }, []);
 
   const toggleSubmenu = (label: string) => {
@@ -247,7 +208,17 @@ export default function UserSideBar() {
     }
 
     // Leaf menu item without children
-    const leafIsActive = location.pathname === item.to;
+    const leafIsActive = (() => {
+      // Xử lý đặc biệt cho các menu có URL parameters
+      if (item.to?.includes('?type=trong-nuoc')) {
+        return location.pathname === '/procedures' && location.search.includes('type=trong-nuoc');
+      }
+      if (item.to?.includes('?type=nuoc-ngoai')) {
+        return location.pathname === '/procedures' && location.search.includes('type=nuoc-ngoai');
+      }
+      // Xử lý thông thường cho các menu khác
+      return location.pathname === item.to;
+    })();
 
     // Nếu có item.to thì cho click, nếu không thì chỉ render text
     if (item.to) {
