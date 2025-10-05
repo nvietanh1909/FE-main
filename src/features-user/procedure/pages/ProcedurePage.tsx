@@ -13,6 +13,7 @@ import ProcedureStepper from '@/features-admin/document/components/ProcedureStep
 import ChatBot from '@/components/ChatBot.tsx';
 import { useNProgress } from "@/hooks/useNProgress.ts";
 import { fetchProcedureDetail, fetchProcedures } from '../services/procedureService.ts';
+import { capitalizeWords, formatCurrency, formatNumber } from '@/utils/textUtils.ts';
 
 // ====== API Response Types ======
 interface ThanhPhanDuToan {
@@ -82,7 +83,14 @@ export default function ProcedurePage() {
         <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
           TÀI LIỆU CẦN CHUẨN BỊ
         </Typography>
-        <table className="w-full border border-gray-300">
+        <table className="w-full border border-gray-300" style={{ tableLayout: 'fixed' }}>
+          <colgroup>
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '45%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '20%' }} />
+            <col style={{ width: '15%' }} />
+          </colgroup>
           <thead className="bg-blue-600 text-white">
             <tr>
               <th className="p-2 border text-center">STT</th>
@@ -96,14 +104,34 @@ export default function ProcedurePage() {
             {procedureData.hosochungtus.map((doc, idx) => (
               <tr key={`${doc.id}-${idx}`}> 
                 <td className="p-2 border text-center">{idx + 1}</td>
-                <td className="p-2 border">{doc.name}</td>
-                <td className="p-2 border">
-                  <input type="number" min={0} style={{ width: 60, padding: 4, border: '1px solid #e5e7eb', borderRadius: 4 }} />
+                <td className="p-2 border" style={{ wordWrap: 'break-word' }}>
+                  {capitalizeWords(doc.name)}
+                </td>
+                <td className="p-2 border text-center">
+                  <input 
+                    type="number" 
+                    min={0} 
+                    defaultValue={1}
+                    style={{ 
+                      width: '100%', 
+                      padding: 4, 
+                      border: '1px solid #e5e7eb', 
+                      borderRadius: 4,
+                      textAlign: 'center'
+                    }} 
+                  />
                 </td>
                 <td className="p-2 border text-center">
                   {doc.path ? (
-                    <a href={doc.path} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Tải mẫu</a>
-                  ) : ''}
+                    <a href={doc.path} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">
+                      Tải mẫu
+                    </a>
+                  ) : (
+                    <span className="text-gray-400">Không có</span>
+                  )}
+                </td>
+                <td className="p-2 border text-center">
+                  <span className="text-xs text-gray-600">01 bản</span>
                 </td>
               </tr>
             ))}
@@ -128,6 +156,17 @@ export default function ProcedurePage() {
   const [budgetInputs, setBudgetInputs] = useState<Record<string, { soLuong?: number; donGia?: number }>>({});
   
   const { startProgress, doneProgress } = useNProgress();
+
+  // Get procedure sub-category name from URL parameters
+  const getProcedureSubName = () => {
+    const type = searchParams.get('type');
+    if (type === 'trong-nuoc') {
+      return 'Công tác phí trong nước';
+    } else if (type === 'nuoc-ngoai') {
+      return 'Công tác phí nước ngoài';
+    }
+    return null;
+  };
 
   const resetState = () => {
     setSelectedItem(null);
@@ -340,7 +379,15 @@ export default function ProcedurePage() {
           CÁC THÀNH PHẦN DỰ TOÁN
         </Typography>
 
-        <table className="w-full border border-gray-300">
+        <table className="w-full border border-gray-300" style={{ tableLayout: 'fixed' }}>
+          <colgroup>
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '32%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '18%' }} />
+            <col style={{ width: '18%' }} />
+            <col style={{ width: '12%' }} />
+          </colgroup>
           <thead className="bg-blue-600 text-white">
             <tr>
               <th className="p-2 border text-center">STT</th>
@@ -353,39 +400,41 @@ export default function ProcedurePage() {
           </thead>
           <tbody>
             {procedureData.thanhphandutoans.map((item, idx) => {
-              // Get values from user input state
-              const soLuong = getBudgetInputValue(item.id, 'soLuong');
-              const donGia = getBudgetInputValue(item.id, 'donGia');
-              const thanhTien = soLuong !== undefined && donGia !== undefined ? soLuong * donGia : undefined;
+              // Get values from user input state or default values
+              const soLuong = getBudgetInputValue(item.id, 'soLuong') || 1;
+              const donGia = getBudgetInputValue(item.id, 'donGia') || 100000;
+              const thanhTien = soLuong * donGia;
               
               return (
                 <tr key={`${item.id}-${idx}`}>
                   <td className="p-2 border text-center">{idx + 1}</td>
-                  <td className="p-2 border font-medium">{item.name}</td>
-                  <td className="p-2 border">
+                  <td className="p-2 border font-medium" style={{ wordWrap: 'break-word' }}>
+                    {capitalizeWords(item.name)}
+                  </td>
+                  <td className="p-2 border text-center">
                     <input
                       type="number"
                       min={0}
-                      value={soLuong || ''}
+                      value={getBudgetInputValue(item.id, 'soLuong') || 1}
                       onChange={(e) => handleBudgetInputChange(item.id, 'soLuong', e.target.value)}
-                      style={{ width: 70, padding: 4, border: '1px solid #e5e7eb', borderRadius: 4 }}
+                      style={{ width: '100%', padding: 4, border: '1px solid #e5e7eb', borderRadius: 4, textAlign: 'center' }}
                     />
                   </td>
-                  <td className="p-2 border">
+                  <td className="p-2 border text-center">
                     <input
                       type="number"
                       min={0}
-                      value={donGia || ''}
+                      value={getBudgetInputValue(item.id, 'donGia') || 100000}
                       onChange={(e) => handleBudgetInputChange(item.id, 'donGia', e.target.value)}
-                      style={{ width: 100, padding: 4, border: '1px solid #e5e7eb', borderRadius: 4 }}
+                      style={{ width: '100%', padding: 4, border: '1px solid #e5e7eb', borderRadius: 4, textAlign: 'right' }}
                     />
                   </td>
-                  <td className="p-2 border text-right">
-                    {thanhTien !== undefined ? thanhTien.toLocaleString('vi-VN') + ' VND' : ''}
+                  <td className="p-2 border text-right font-medium" style={{ color: '#059669' }}>
+                    {formatCurrency(thanhTien)}
                   </td>
-                  <td className="p-2 border">
+                  <td className="p-2 border text-center">
                     <Chip 
-                      label={item.type === 'domestic' ? 'Trong nước' : 'Quốc tế'} 
+                      label={capitalizeWords(item.type === 'domestic' ? 'trong nước' : 'quốc tế')} 
                       size="small" 
                       color={item.type === 'domestic' ? 'primary' : 'secondary'}
                     />
@@ -610,7 +659,16 @@ export default function ProcedurePage() {
               </div>
 
               <div className="w-32%">
-                <ChatBot />
+                <ChatBot 
+                  procedureName={getProcedureSubName()}
+                  currentStep={
+                    activeStep === 0 ? "lập hồ sơ dự toán" :
+                    activeStep === 1 ? "chuẩn bị các giấy tờ kèm theo" :
+                    activeStep === 2 ? "nộp hồ sơ và xét duyệt" :
+                    activeStep === 3 ? "hoàn thành thủ tục" :
+                    "thực hiện thủ tục"
+                  }
+                />
               </div>
             </div>
           </>

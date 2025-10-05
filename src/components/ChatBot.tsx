@@ -8,7 +8,6 @@ import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import remarkGfm from "remark-gfm";
 import "../assets/styles/chatbot.css";
 
-// RAG Service
 class RAGService { 
   private baseUrl = "https://umentor.duckdns.org/api";
   
@@ -96,15 +95,22 @@ class RAGService {
 
 const ragService = new RAGService();
 
-export default function ChatBot() {
+interface ChatBotProps {
+  procedureName?: string;
+  currentStep?: string;
+}
+
+export default function ChatBot({ procedureName, currentStep }: ChatBotProps = {}) {
+  const getGreetingMessage = () => {
+    if (procedureName) {
+      return `Xin chào quý thầy cô! Quý thầy cô cần hỗ trợ gì trong ${procedureName}?`;
+    } else {
+      return "Xin chào quý thầy cô! Tôi là UET Assistant - trợ lý thông minh của bạn. Quý thầy cô có thể upload tài liệu và hỏi tôi về nội dung đó!";
+    }
+  };
+
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      text: "Xin chào! Tôi là trợ lý thông minh RAG của bạn. Bạn có thể upload tài liệu và hỏi tôi về nội dung đó!",
-      isBot: true,
-    },
-  ]);
+  const [messages, setMessages] = useState<Array<{id: number, text: string, isBot: boolean}>>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [messageQueue, setMessageQueue] = useState<string[]>([]);
@@ -115,6 +121,16 @@ export default function ChatBot() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setMessages([
+      {
+        id: 1,
+        text: getGreetingMessage(),
+        isBot: true,
+      },
+    ]);
+  }, [procedureName, currentStep]);
 
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
@@ -155,7 +171,6 @@ export default function ChatBot() {
 
         await ragService.streamRAG(currentMessage, selectedFile, (chunk) => {
           if (!hasReceivedContent) {
-            // Lần đầu nhận content, tạo bot message và tắt typing
             hasReceivedContent = true;
             setIsTyping(false);
             setMessages((prev) => [
@@ -163,7 +178,6 @@ export default function ChatBot() {
               { id: botId, text: chunk, isBot: true },
             ]);
           } else {
-            // Update nội dung bot message
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === botId ? { ...msg, text: msg.text + chunk } : msg
@@ -172,7 +186,6 @@ export default function ChatBot() {
           }
         });
 
-        // Nếu không nhận được content nào, hiển thị lỗi
         if (!hasReceivedContent) {
           setIsTyping(false);
           setMessages((prev) => [
@@ -341,7 +354,6 @@ export default function ChatBot() {
         transition: "all 0.3s ease-in-out",
       }}
     >
-      {/* Header chatbot */}
       <div
         style={{
           background: "#f8f9fa",
@@ -394,7 +406,7 @@ export default function ChatBot() {
             </Avatar>
           </Badge>
           <div>
-            <div>Trợ lý RAG</div>
+            <div>UET Assistant</div>
             {selectedFile && (
               <div
                 style={{ fontSize: "12px", color: "#6b7280", fontWeight: 400 }}
@@ -447,7 +459,6 @@ export default function ChatBot() {
         </div>
       </div>
 
-      {/* Chat messages area */}
       <div
         ref={chatContainerRef}
         style={{
@@ -517,8 +528,9 @@ export default function ChatBot() {
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
-                    code: ({ node, inline, className, children, ...props }) => {
+                    code: ({ node, className, children, ...props }: any) => {
                       const match = /language-(\w+)/.exec(className || "");
+                      const inline = !match;
                       return !inline && match ? (
                         <SyntaxHighlighter
                           style={oneLight}
@@ -694,7 +706,6 @@ export default function ChatBot() {
           </div>
         ))}
 
-        {/* Typing indicator - chỉ hiển thị khi isTyping = true */}
         {(isTyping || isUploading) && (
           <div
             style={{
@@ -761,7 +772,6 @@ export default function ChatBot() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input area */}
       <div
         style={{
           padding: "20px",

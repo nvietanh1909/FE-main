@@ -85,18 +85,16 @@ export default function UserSideBar() {
     const staticMenu = [
       {
         label: 'Bảng điều khiển',
-        desc: 'Tổng quan hệ thống',
         icon: <MdDashboard />,
         to: '/',
       },
       {
-        label: 'Tra cứu thủ tục',
-        desc: 'Quy trình và thủ tục thanh toán',
+        label: 'Danh mục quy trình',
         icon: <MdOutlineContentPasteSearch />,
         to: '/procedures',
         children: [
           {
-            label: 'Quy trình thanh toán hoạt động thường xuyên',
+            label: 'Thanh toán hoạt động thường xuyên',
             to: '/procedures?category=payment',
             children: [
               {
@@ -108,23 +106,25 @@ export default function UserSideBar() {
                 to: '/procedures?type=nuoc-ngoai'
               }
             ]
+          },
+          {
+            label: 'Thanh toán chi phí hoạt động chuyên môn',
+            to: '/procedures?category=professional'
           }
         ]
       },
       {
         label: 'Tin nhắn',
-        desc: 'Hỗ trợ và trao đổi',
         icon: <FaComments />,
         to: '/messages',
       },
       {
         label: 'Cài đặt',
-        desc: 'Cấu hình tài khoản',
         icon: <FaCog />,
         to: '/settings',
       }
     ];
-
+    
     setMenu(staticMenu);
   }, []);
 
@@ -177,9 +177,6 @@ export default function UserSideBar() {
                     }`}
                 >
                   {item.label}
-                </div>
-                <div className="text-xs text-gray-500  mt-0.5 leading-tight">
-                  {item.desc}
                 </div>
               </div>
             )}
@@ -247,9 +244,6 @@ export default function UserSideBar() {
                 className={`font-medium ${level === 0 ? 'text-[1rem]' : 'text-sm  !font-400'} transition-colors duration-200 ${leafIsActive ? 'text-blue-600' : 'text-gray-700 group-hover:text-blue-600'}`}
               >
                 {item.label}
-              </div>
-              <div className="text-xs text-gray-500 mt-0.5 leading-tight">
-                {item.desc}
               </div>
             </div>
           )}
