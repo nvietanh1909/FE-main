@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FiSend, FiUpload, FiMaximize2, FiMinimize2 } from "react-icons/fi";
+import { FiSend, FiMaximize2, FiMinimize2 } from "react-icons/fi";
 import { RiRobot2Line } from "react-icons/ri";
 import { Avatar, Badge, IconButton, Tooltip } from "@mui/material";
 import ReactMarkdown from "react-markdown";
@@ -68,29 +68,6 @@ class RAGService {
       if (onChunk) onChunk(chunk);
     }
   }
-
-  async uploadDocument(
-    file: File
-  ): Promise<{ message: string; filename: string }> {
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const response = await fetch(`${this.baseUrl}/upload`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Upload failed: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("Upload Error:", error);
-      throw new Error("Không thể upload tài liệu");
-    }
-  }
 }
 
 const ragService = new RAGService();
@@ -105,7 +82,7 @@ export default function ChatBot({ procedureName, currentStep }: ChatBotProps = {
     if (procedureName) {
       return `Xin chào quý thầy cô! Quý thầy cô cần hỗ trợ gì trong ${procedureName}?`;
     } else {
-      return "Xin chào quý thầy cô! Tôi là UET Assistant - trợ lý thông minh của bạn. Quý thầy cô có thể upload tài liệu và hỏi tôi về nội dung đó!";
+      return "Xin chào quý thầy cô! Tôi là UET Assistant - trợ lý thông minh của bạn. Tôi có thể giúp bạn trả lời các câu hỏi về quy trình và thủ tục của trường!";
     }
   };
 
@@ -114,13 +91,10 @@ export default function ChatBot({ procedureName, currentStep }: ChatBotProps = {
   const [isTyping, setIsTyping] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [messageQueue, setMessageQueue] = useState<string[]>([]);
-  const [selectedFile, setSelectedFile] = useState<string>("");
-  const [isUploading, setIsUploading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [streamingBotId, setStreamingBotId] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setMessages([
@@ -169,7 +143,7 @@ export default function ChatBot({ procedureName, currentStep }: ChatBotProps = {
       try {
         let hasReceivedContent = false;
 
-        await ragService.streamRAG(currentMessage, selectedFile, (chunk) => {
+        await ragService.streamRAG(currentMessage, undefined, (chunk) => {
           if (!hasReceivedContent) {
             hasReceivedContent = true;
             setIsTyping(false);
@@ -237,7 +211,7 @@ export default function ChatBot({ procedureName, currentStep }: ChatBotProps = {
         try {
           let hasReceivedContent = false;
 
-          await ragService.streamRAG(nextMessage, selectedFile, (chunk) => {
+          await ragService.streamRAG(nextMessage, undefined, (chunk) => {
             if (!hasReceivedContent) {
               hasReceivedContent = true;
               setIsTyping(false);
@@ -282,42 +256,6 @@ export default function ChatBot({ procedureName, currentStep }: ChatBotProps = {
           setMessages((prev) => [...prev, errorResponse]);
         }
       }, 500);
-    }
-  };
-
-  const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
-
-    try {
-      const result = await ragService.uploadDocument(file);
-
-      setSelectedFile(result.filename);
-
-      const successMessage = {
-        id: Date.now(),
-        text: `✅ **Đã upload thành công tài liệu:** ${result.filename}\n\nBây giờ bạn có thể hỏi tôi về nội dung trong tài liệu này!`,
-        isBot: true,
-      };
-
-      setMessages((prev) => [...prev, successMessage]);
-    } catch (error) {
-      const errorMessage = {
-        id: Date.now(),
-        text: "❌ **Không thể upload tài liệu.** Vui lòng kiểm tra định dạng file (PDF, TXT, DOCX) và thử lại.",
-        isBot: true,
-      };
-
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
     }
   };
 
@@ -407,38 +345,10 @@ export default function ChatBot({ procedureName, currentStep }: ChatBotProps = {
           </Badge>
           <div>
             <div>UET Assistant</div>
-            {selectedFile && (
-              <div
-                style={{ fontSize: "12px", color: "#6b7280", fontWeight: 400 }}
-              >
-                📄 {selectedFile}
-              </div>
-            )}
           </div>
         </div>
 
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-            accept=".pdf,.txt,.docx"
-            style={{ display: "none" }}
-          />
-          <Tooltip title="Upload tài liệu (PDF, TXT, DOCX)">
-            <IconButton
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isUploading || isProcessing}
-              sx={{
-                bgcolor: "#3b82f6",
-                color: "white",
-                "&:hover": { bgcolor: "#2563eb" },
-                "&:disabled": { bgcolor: "#d1d5db" },
-              }}
-            >
-              <FiUpload size={18} />
-            </IconButton>
-          </Tooltip>
 
           <Tooltip title={isExpanded ? "Thu gọn" : "Mở rộng"}>
             <IconButton
@@ -706,7 +616,7 @@ export default function ChatBot({ procedureName, currentStep }: ChatBotProps = {
           </div>
         ))}
 
-        {(isTyping || isUploading) && (
+        {/* {isTyping && (
           <div
             style={{
               display: "flex",
@@ -756,18 +666,14 @@ export default function ChatBot({ procedureName, currentStep }: ChatBotProps = {
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
               }}
             >
-              {isUploading ? (
-                <span>Đang upload tài liệu...</span>
-              ) : (
-                <div className="typing-indicator">
-                  <div className="typing-dot"></div>
-                  <div className="typing-dot"></div>
-                  <div className="typing-dot"></div>
-                </div>
-              )}
+              <div className="typing-indicator">
+                <div className="typing-dot"></div>
+                <div className="typing-dot"></div>
+                <div className="typing-dot"></div>
+              </div>
             </div>
           </div>
-        )}
+        )} */}
 
         <div ref={messagesEndRef} />
       </div>
@@ -795,15 +701,11 @@ export default function ChatBot({ procedureName, currentStep }: ChatBotProps = {
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={
-              isUploading
-                ? "Đang upload..."
-                : isProcessing
+              isProcessing
                 ? "Đang xử lý tin nhắn..."
-                : selectedFile
-                ? `Hỏi về ${selectedFile}...`
-                : "Nhập tin nhắn hoặc upload tài liệu để bắt đầu..."
+                : "Nhập câu hỏi của quý thầy cô..."
             }
-            disabled={isProcessing || isUploading}
+            disabled={isProcessing}
             rows={1}
             style={{
               flex: 1,
@@ -813,7 +715,7 @@ export default function ChatBot({ procedureName, currentStep }: ChatBotProps = {
               fontSize: "14px",
               outline: "none",
               backgroundColor: "transparent",
-              color: isProcessing || isUploading ? "#9ca3af" : "inherit",
+              color: isProcessing ? "#9ca3af" : "inherit",
               resize: "none",
               fontFamily: "inherit",
               lineHeight: "1.4",
@@ -821,10 +723,10 @@ export default function ChatBot({ procedureName, currentStep }: ChatBotProps = {
           />
           <button
             onClick={handleSendMessage}
-            disabled={!message.trim() || isProcessing || isUploading}
+            disabled={!message.trim() || isProcessing}
             style={{
               background:
-                message.trim() && !isProcessing && !isUploading
+                message.trim() && !isProcessing
                   ? "#3b82f6"
                   : "#d1d5db",
               color: "#fff",
@@ -833,7 +735,7 @@ export default function ChatBot({ procedureName, currentStep }: ChatBotProps = {
               width: "48px",
               height: "48px",
               cursor:
-                message.trim() && !isProcessing && !isUploading
+                message.trim() && !isProcessing
                   ? "pointer"
                   : "not-allowed",
               display: "flex",

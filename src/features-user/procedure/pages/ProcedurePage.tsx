@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLocation, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
@@ -19,8 +18,10 @@ import { capitalizeWords, formatCurrency, formatNumber } from '@/utils/textUtils
 interface ThanhPhanDuToan {
   id: string;
   name: string;
-  description: string;
-  type: string;
+  description?: string;
+  type?: string;
+  isGroup?: boolean;
+  children?: ThanhPhanDuToan[];
   // Optional fields for user input
   soLuong?: number;
   donGia?: number;
@@ -279,6 +280,17 @@ export default function ProcedurePage() {
     }
   }, [location.search, params.id]);
 
+  // Debug logging để theo dõi state changes
+  useEffect(() => {
+    console.log('🔍 ProcedurePage state:', { 
+      loading, 
+      error, 
+      selectedItem, 
+      procedureData: !!procedureData,
+      proceduresList: proceduresList.length 
+    });
+  }, [loading, error, selectedItem, procedureData, proceduresList]);
+
   const loadProceduresList = async (type: string) => {
     try {
       setLoading(true);
@@ -325,6 +337,7 @@ export default function ProcedurePage() {
       setError('Có lỗi xảy ra khi tải danh sách thủ tục');
     } finally {
       setLoading(false);
+      console.log('loading 1:', loading);
       doneProgress();
     }
   };
@@ -333,7 +346,7 @@ export default function ProcedurePage() {
     try {
       setLoading(true);
       setError(null);
-      startProgress();
+      // startProgress();
       
       console.log('Loading procedure data for ID:', procedureId);
       const response: ProcedureResponse = await fetchProcedureDetail(procedureId);
@@ -346,7 +359,7 @@ export default function ProcedurePage() {
         setSelectedTitle(response.data.title);
       } else {
         console.error('Invalid response structure:', response);
-        setError('Không thể tải dữ liệu thủ tục');
+        setError(response?.error || 'Không thể tải dữ liệu thủ tục');
       }
     } catch (err) {
       console.error('Error loading procedure data:', err);
@@ -357,7 +370,8 @@ export default function ProcedurePage() {
       }
     } finally {
       setLoading(false);
-      doneProgress();
+      console.log('loadProcedureData:', loading);
+      // doneProgress();
     }
   };
 
@@ -400,11 +414,64 @@ export default function ProcedurePage() {
           </thead>
           <tbody>
             {procedureData.thanhphandutoans.map((item, idx) => {
-              // Get values from user input state or default values
+              // Nếu là group -> render 1 row tiêu đề (colSpan) và render children tiếp theo
+              if (item.isGroup && Array.isArray(item.children) && item.children.length > 0) {
+                return (
+                  <React.Fragment key={`${item.id}-${idx}`}>
+                    <tr>
+                      <td className="p-2 border text-center">{idx + 1}</td>
+                      <td className="p-2 border font-medium" style={{ wordWrap: 'break-word' }} colSpan={5}>
+                        {capitalizeWords(item.name)}
+                      </td>
+                    </tr>
+                    {item.children.map((child, cidx) => {
+                      const soLuong = getBudgetInputValue(child.id, 'soLuong') || 1;
+                      const donGia = getBudgetInputValue(child.id, 'donGia') || 100000;
+                      const thanhTien = soLuong * donGia;
+                      return (
+                        <tr key={`${child.id}-${cidx}`}>
+                          <td className="p-2 border text-center"></td>
+                          <td className="p-2 border" style={{ paddingLeft: 20 }}>{capitalizeWords(child.name)}</td>
+                          <td className="p-2 border text-center">
+                            <input
+                              type="number"
+                              min={0}
+                              value={getBudgetInputValue(child.id, 'soLuong') || 1}
+                              onChange={(e) => handleBudgetInputChange(child.id, 'soLuong', e.target.value)}
+                              style={{ width: '100%', padding: 4, border: '1px solid #e5e7eb', borderRadius: 4, textAlign: 'center' }}
+                            />
+                          </td>
+                          <td className="p-2 border text-center">
+                            <input
+                              type="number"
+                              min={0}
+                              value={getBudgetInputValue(child.id, 'donGia') || 100000}
+                              onChange={(e) => handleBudgetInputChange(child.id, 'donGia', e.target.value)}
+                              style={{ width: '100%', padding: 4, border: '1px solid #e5e7eb', borderRadius: 4, textAlign: 'right' }}
+                            />
+                          </td>
+                          <td className="p-2 border text-right font-medium" style={{ color: '#059669' }}>
+                            {formatCurrency(thanhTien)}
+                          </td>
+                          <td className="p-2 border text-center">
+                            <Chip 
+                              label={capitalizeWords(child.type === 'domestic' ? 'trong nước' : 'quốc tế')} 
+                              size="small" 
+                              color={child.type === 'domestic' ? 'primary' : 'secondary'}
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </React.Fragment>
+                );
+              }
+
+              // Bình thường (không phải group)
               const soLuong = getBudgetInputValue(item.id, 'soLuong') || 1;
               const donGia = getBudgetInputValue(item.id, 'donGia') || 100000;
               const thanhTien = soLuong * donGia;
-              
+
               return (
                 <tr key={`${item.id}-${idx}`}>
                   <td className="p-2 border text-center">{idx + 1}</td>
@@ -444,8 +511,7 @@ export default function ProcedurePage() {
             })}
           </tbody>
         </table>
-        
-        {/* Save Budget Button */}
+
         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
           <Button
             variant="contained"
@@ -456,7 +522,6 @@ export default function ProcedurePage() {
             Lưu dự toán
           </Button>
         </Box>
-        
       </Box>
     );
   };
@@ -508,6 +573,7 @@ export default function ProcedurePage() {
 
   const currentStep = steps[activeStep];
 
+  console.log('LOADING', loading);
   if (loading) {
     return (
       <div className="flex h-screen">
@@ -515,7 +581,7 @@ export default function ProcedurePage() {
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
             <CircularProgress size={60} />
             <Typography variant="h6" color="text.secondary">
-              Đang tải dữ liệu thủ tục...
+              Đang tải...
             </Typography>
           </Box>
         </div>

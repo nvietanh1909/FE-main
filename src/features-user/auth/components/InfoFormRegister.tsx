@@ -1,5 +1,5 @@
 import React from 'react'
-import ImgLogoUET from "@/assets/images/ImgLogoUET.png";
+import logoUET from "@/assets/images/ImgLogoUET.png";
 import UET from "@/assets/images/UET.svg";
 import RegisterImg from "@/assets/images/undraw_referral_j2rw.svg";
 
@@ -8,7 +8,7 @@ export default function InfoFormRegister() {
         <div className="relative w-[947.74px] h-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#146DA8] to-[#0E3454]">
                 {/* Header bên trái */}
                 <div className="absolute top-0 left-0 w-full flex items-center gap-3 px-8 py-5 z-[10] bg">
-                    <img src={ImgLogoUET} alt="Logo UET" className="h-20 w-auto drop-shadow-md" />
+                    <img src={logoUET} alt="Logo UET" className="h-20 w-auto drop-shadow-md" />
                     <span className="text-white text-[1.4rem] font-bold tracking-wide drop-shadow">Phòng Kế hoạch Tài chính</span>
                 </div>
                 
