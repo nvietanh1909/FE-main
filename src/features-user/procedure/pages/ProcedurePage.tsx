@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import { Box, Paper, Chip, Divider, CircularProgress, Alert, Collapse, IconButton } from '@mui/material';
+import { Box, Paper, Chip, Divider, CircularProgress, Alert, Collapse, IconButton, Button } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { FaHome, FaClock, FaFileAlt, FaInfoCircle, FaArrowLeft } from 'react-icons/fa';
@@ -12,14 +11,20 @@ import nprogress from 'nprogress';
 import ProcedureStepper from '@/features-admin/document/components/ProcedureStepper.tsx';
 import ChatBot from '@/components/ChatBot.tsx';
 import { useNProgress } from "@/hooks/useNProgress.ts";
-import { fetchProcedureDetail } from '../services/procedureService.ts';
+import { fetchProcedureDetail, fetchProcedures } from '../services/procedureService.ts';
+import { capitalizeWords, formatCurrency, formatNumber } from '@/utils/textUtils.ts';
 
 // ====== API Response Types ======
 interface ThanhPhanDuToan {
   id: string;
   name: string;
-  description: string;
-  type: string;
+  description?: string;
+  type?: string;
+  isGroup?: boolean;
+  children?: ThanhPhanDuToan[];
+  // Optional fields for user input
+  soLuong?: number;
+  donGia?: number;
 }
 
 interface HoSoChungTu {
@@ -61,6 +66,7 @@ const steps = [
 ];
 
 export default function ProcedurePage() {
+  const navigate = useNavigate();
   // Bảng tài liệu cần chuẩn bị cho bước 2
   const renderTaiLieuTable = () => {
     if (!procedureData?.hosochungtus || procedureData.hosochungtus.length === 0) return null;
@@ -78,7 +84,14 @@ export default function ProcedurePage() {
         <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
           TÀI LIỆU CẦN CHUẨN BỊ
         </Typography>
-        <table className="w-full border border-gray-300">
+        <table className="w-full border border-gray-300" style={{ tableLayout: 'fixed' }}>
+          <colgroup>
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '45%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '20%' }} />
+            <col style={{ width: '15%' }} />
+          </colgroup>
           <thead className="bg-blue-600 text-white">
             <tr>
               <th className="p-2 border text-center">STT</th>
@@ -92,14 +105,34 @@ export default function ProcedurePage() {
             {procedureData.hosochungtus.map((doc, idx) => (
               <tr key={`${doc.id}-${idx}`}> 
                 <td className="p-2 border text-center">{idx + 1}</td>
-                <td className="p-2 border">{doc.name}</td>
-                <td className="p-2 border">
-                  <input type="number" min={0} style={{ width: 60, padding: 4, border: '1px solid #e5e7eb', borderRadius: 4 }} />
+                <td className="p-2 border" style={{ wordWrap: 'break-word' }}>
+                  {capitalizeWords(doc.name)}
+                </td>
+                <td className="p-2 border text-center">
+                  <input 
+                    type="number" 
+                    min={0} 
+                    defaultValue={1}
+                    style={{ 
+                      width: '100%', 
+                      padding: 4, 
+                      border: '1px solid #e5e7eb', 
+                      borderRadius: 4,
+                      textAlign: 'center'
+                    }} 
+                  />
                 </td>
                 <td className="p-2 border text-center">
                   {doc.path ? (
-                    <a href={doc.path} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Tải mẫu</a>
-                  ) : ''}
+                    <a href={doc.path} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">
+                      Tải mẫu
+                    </a>
+                  ) : (
+                    <span className="text-gray-400">Không có</span>
+                  )}
+                </td>
+                <td className="p-2 border text-center">
+                  <span className="text-xs text-gray-600">01 bản</span>
                 </td>
               </tr>
             ))}
@@ -111,42 +144,209 @@ export default function ProcedurePage() {
   const [showDocuments, setShowDocuments] = useState(false);
   const location = useLocation();
   const params = useParams();
+  const [searchParams] = useSearchParams();
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [selectedTitle, setSelectedTitle] = useState<string>("");
   const [activeStep, setActiveStep] = useState(0);
   const [procedureData, setProcedureData] = useState<ProcedureData | null>(null);
+  const [proceduresList, setProceduresList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // State to track user input for budget components
+  const [budgetInputs, setBudgetInputs] = useState<Record<string, { soLuong?: number; donGia?: number }>>({});
+  
   const { startProgress, doneProgress } = useNProgress();
 
-  useEffect(() => {
-    // Check for path parameter first (e.g., /procedures/4:20fc5928-6361-4898-af87-91e3a62d9acf:177)
-    const procedureId = params.id;
+  // Get procedure sub-category name from URL parameters
+  const getProcedureSubName = () => {
+    const type = searchParams.get('type');
+    if (type === 'trong-nuoc') {
+      return 'Công tác phí trong nước';
+    } else if (type === 'nuoc-ngoai') {
+      return 'Công tác phí nước ngoài';
+    }
+    return null;
+  };
+
+  const resetState = () => {
+    setSelectedItem(null);
+    setSelectedTitle("");
+    setActiveStep(0);
+    setProcedureData(null);
+    setProceduresList([]);
+    setBudgetInputs({}); // Clear user input data
+  };
+
+  // Handle budget input changes
+  const handleBudgetInputChange = (itemId: string, field: 'soLuong' | 'donGia', value: string) => {
+    const numValue = value === '' ? undefined : Number(value);
+    setBudgetInputs(prev => ({
+      ...prev,
+      [itemId]: {
+        ...prev[itemId],
+        [field]: numValue
+      }
+    }));
+  };
+
+  // Get current input value for a budget item
+  const getBudgetInputValue = (itemId: string, field: 'soLuong' | 'donGia'): number | undefined => {
+    return budgetInputs[itemId]?.[field];
+  };
+
+  // Calculate total amount for all budget items
+  const calculateTotalAmount = (): number => {
+    if (!procedureData?.thanhphandutoans) return 0;
     
-    // Check for URL parameters (e.g., /procedures?process=p1&item=168)
+    return procedureData.thanhphandutoans.reduce((total, item) => {
+      const soLuong = getBudgetInputValue(item.id, 'soLuong');
+      const donGia = getBudgetInputValue(item.id, 'donGia');
+      if (soLuong !== undefined && donGia !== undefined) {
+        return total + (soLuong * donGia);
+      }
+      return total;
+    }, 0);
+  };
+
+  // Prepare budget data for saving to database
+  const prepareBudgetDataForSave = () => {
+    if (!procedureData?.thanhphandutoans) return [];
+    
+    return procedureData.thanhphandutoans.map(item => ({
+      id: item.id,
+      name: item.name,
+      soLuong: getBudgetInputValue(item.id, 'soLuong'),
+      donGia: getBudgetInputValue(item.id, 'donGia'),
+      thanhTien: (() => {
+        const soLuong = getBudgetInputValue(item.id, 'soLuong');
+        const donGia = getBudgetInputValue(item.id, 'donGia');
+        return soLuong !== undefined && donGia !== undefined ? soLuong * donGia : undefined;
+      })()
+    })).filter(item => item.soLuong !== undefined || item.donGia !== undefined); // Only include items with user input
+  };
+
+  // Save budget data to backend (placeholder function)
+  const saveBudgetData = async () => {
+    try {
+      const budgetData = prepareBudgetDataForSave();
+      const totalAmount = calculateTotalAmount();
+      
+      console.log('Budget data to save:', {
+        procedureId: selectedItem,
+        budgetItems: budgetData,
+        totalAmount: totalAmount
+      });
+      
+      // TODO: Implement API call to save budget data
+      // const response = await fetch(`${BASE_URL}/procedures/${selectedItem}/budget`, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Authorization': `Bearer ${getToken()}`
+      //   },
+      //   body: JSON.stringify({
+      //     budgetItems: budgetData,
+      //     totalAmount: totalAmount
+      //   })
+      // });
+      
+      alert('Dữ liệu dự toán đã được chuẩn bị để lưu. Kiểm tra console để xem dữ liệu.');
+    } catch (error) {
+      console.error('Error saving budget data:', error);
+      alert('Có lỗi xảy ra khi lưu dữ liệu dự toán.');
+    }
+  };
+
+  useEffect(() => {
+    // Check for URL parameters
     const urlParams = new URLSearchParams(location.search);
-    const processId = urlParams.get('process');
+    const type = urlParams.get('type');
+    const procedureId = params.id;
     const itemId = urlParams.get('item');
     
-    // Priority: path parameter > URL parameter
-    const finalProcedureId = procedureId || itemId;
+    console.log('ProcedurePage useEffect triggered:', { type, procedureId, itemId, pathname: location.pathname, search: location.search });
     
-    if (finalProcedureId) {
+    if (procedureId || itemId) {
+      // Load specific procedure by ID
+      const finalProcedureId = procedureId || itemId;
       loadProcedureData(finalProcedureId);
+    } else if (type) {
+      // Load procedures list and filter by type
+      loadProceduresList(type);
     } else {
-      // Reset if no specific item selected
-      setSelectedItem(null);
-      setSelectedTitle("");
-      setActiveStep(0);
-      setProcedureData(null);
+      // Reset if no parameters
+      resetState();
     }
   }, [location.search, params.id]);
+
+  // Debug logging để theo dõi state changes
+  useEffect(() => {
+    console.log('🔍 ProcedurePage state:', { 
+      loading, 
+      error, 
+      selectedItem, 
+      procedureData: !!procedureData,
+      proceduresList: proceduresList.length 
+    });
+  }, [loading, error, selectedItem, procedureData, proceduresList]);
+
+  const loadProceduresList = async (type: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      startProgress();
+      
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const response = await fetchProcedures(token);
+      
+      if (response && response.success) {
+        let filteredItems = [];
+        
+        if (type === 'trong-nuoc') {
+          // Filter items with parent path: "QUY TRÌNH 1. THANH TOÁN HOẠT ĐỘNG THƯỜNG XUYÊN / Công tác phí trong nước"
+          filteredItems = response.data.filter((item: any) => {
+            const parent = item?.parent ?? '';
+            const normalizedParent = parent.toLowerCase().normalize('NFC');
+            return normalizedParent.includes("thanh toán hoạt động thường xuyên") &&
+                   normalizedParent.includes("công tác phí trong nước");
+          });
+          setSelectedTitle("Công tác phí trong nước");
+        } else if (type === 'nuoc-ngoai') {
+          // Filter items with parent path: "QUY TRÌNH 1. THANH TOÁN HOẠT ĐỘNG THƯỜNG XUYÊN / Công tác phí nước ngoài"
+          filteredItems = response.data.filter((item: any) => {
+            const parent = item?.parent ?? '';
+            const normalizedParent = parent.toLowerCase().normalize('NFC');
+            return normalizedParent.includes("thanh toán hoạt động thường xuyên") &&
+                   normalizedParent.includes("công tác phí nước ngoài");
+          });
+          setSelectedTitle("Công tác phí nước ngoài");
+        }
+        
+        console.log(`Filtered items for ${type}:`, filteredItems);
+        console.log('Sample parent strings:', response.data.slice(0, 3).map((item: any) => item.parent));
+        setProceduresList(filteredItems);
+        
+        // If only one item, load it directly
+        if (filteredItems.length === 1) {
+          loadProcedureData(filteredItems[0].id);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading procedures list:', err);
+      setError('Có lỗi xảy ra khi tải danh sách thủ tục');
+    } finally {
+      setLoading(false);
+      console.log('loading 1:', loading);
+      doneProgress();
+    }
+  };
 
   const loadProcedureData = async (procedureId: string) => {
     try {
       setLoading(true);
       setError(null);
-      startProgress();
+      // startProgress();
       
       console.log('Loading procedure data for ID:', procedureId);
       const response: ProcedureResponse = await fetchProcedureDetail(procedureId);
@@ -159,7 +359,7 @@ export default function ProcedurePage() {
         setSelectedTitle(response.data.title);
       } else {
         console.error('Invalid response structure:', response);
-        setError('Không thể tải dữ liệu thủ tục');
+        setError(response?.error || 'Không thể tải dữ liệu thủ tục');
       }
     } catch (err) {
       console.error('Error loading procedure data:', err);
@@ -170,7 +370,8 @@ export default function ProcedurePage() {
       }
     } finally {
       setLoading(false);
-      doneProgress();
+      console.log('loadProcedureData:', loading);
+      // doneProgress();
     }
   };
 
@@ -192,7 +393,15 @@ export default function ProcedurePage() {
           CÁC THÀNH PHẦN DỰ TOÁN
         </Typography>
 
-        <table className="w-full border border-gray-300">
+        <table className="w-full border border-gray-300" style={{ tableLayout: 'fixed' }}>
+          <colgroup>
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '32%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '18%' }} />
+            <col style={{ width: '18%' }} />
+            <col style={{ width: '12%' }} />
+          </colgroup>
           <thead className="bg-blue-600 text-white">
             <tr>
               <th className="p-2 border text-center">STT</th>
@@ -205,34 +414,94 @@ export default function ProcedurePage() {
           </thead>
           <tbody>
             {procedureData.thanhphandutoans.map((item, idx) => {
-              // Lấy số lượng và đơn giá từ input nếu có, nếu không lấy từ item
-              const soLuong = item.soLuong !== undefined && item.soLuong !== null && item.soLuong !== '' ? Number(item.soLuong) : undefined;
-              const donGia = item.donGia !== undefined && item.donGia !== null && item.donGia !== '' ? Number(item.donGia) : undefined;
-              const thanhTien = soLuong !== undefined && donGia !== undefined ? soLuong * donGia : undefined;
+              // Nếu là group -> render 1 row tiêu đề (colSpan) và render children tiếp theo
+              if (item.isGroup && Array.isArray(item.children) && item.children.length > 0) {
+                return (
+                  <React.Fragment key={`${item.id}-${idx}`}>
+                    <tr>
+                      <td className="p-2 border text-center">{idx + 1}</td>
+                      <td className="p-2 border font-medium" style={{ wordWrap: 'break-word' }} colSpan={5}>
+                        {capitalizeWords(item.name)}
+                      </td>
+                    </tr>
+                    {item.children.map((child, cidx) => {
+                      const soLuong = getBudgetInputValue(child.id, 'soLuong') || 1;
+                      const donGia = getBudgetInputValue(child.id, 'donGia') || 100000;
+                      const thanhTien = soLuong * donGia;
+                      return (
+                        <tr key={`${child.id}-${cidx}`}>
+                          <td className="p-2 border text-center"></td>
+                          <td className="p-2 border" style={{ paddingLeft: 20 }}>{capitalizeWords(child.name)}</td>
+                          <td className="p-2 border text-center">
+                            <input
+                              type="number"
+                              min={0}
+                              value={getBudgetInputValue(child.id, 'soLuong') || 1}
+                              onChange={(e) => handleBudgetInputChange(child.id, 'soLuong', e.target.value)}
+                              style={{ width: '100%', padding: 4, border: '1px solid #e5e7eb', borderRadius: 4, textAlign: 'center' }}
+                            />
+                          </td>
+                          <td className="p-2 border text-center">
+                            <input
+                              type="number"
+                              min={0}
+                              value={getBudgetInputValue(child.id, 'donGia') || 100000}
+                              onChange={(e) => handleBudgetInputChange(child.id, 'donGia', e.target.value)}
+                              style={{ width: '100%', padding: 4, border: '1px solid #e5e7eb', borderRadius: 4, textAlign: 'right' }}
+                            />
+                          </td>
+                          <td className="p-2 border text-right font-medium" style={{ color: '#059669' }}>
+                            {formatCurrency(thanhTien)}
+                          </td>
+                          <td className="p-2 border text-center">
+                            <Chip 
+                              label={capitalizeWords(child.type === 'domestic' ? 'trong nước' : 'quốc tế')} 
+                              size="small" 
+                              color={child.type === 'domestic' ? 'primary' : 'secondary'}
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </React.Fragment>
+                );
+              }
+
+              // Bình thường (không phải group)
+              const soLuong = getBudgetInputValue(item.id, 'soLuong') || 1;
+              const donGia = getBudgetInputValue(item.id, 'donGia') || 100000;
+              const thanhTien = soLuong * donGia;
+
               return (
                 <tr key={`${item.id}-${idx}`}>
                   <td className="p-2 border text-center">{idx + 1}</td>
-                  <td className="p-2 border font-medium">{item.name}</td>
-                  <td className="p-2 border">
+                  <td className="p-2 border font-medium" style={{ wordWrap: 'break-word' }}>
+                    {capitalizeWords(item.name)}
+                  </td>
+                  <td className="p-2 border text-center">
                     <input
                       type="number"
                       min={0}
-                      defaultValue={item.soLuong || ''}
-                      style={{ width: 70, padding: 4, border: '1px solid #e5e7eb', borderRadius: 4 }}
+                      value={getBudgetInputValue(item.id, 'soLuong') || 1}
+                      onChange={(e) => handleBudgetInputChange(item.id, 'soLuong', e.target.value)}
+                      style={{ width: '100%', padding: 4, border: '1px solid #e5e7eb', borderRadius: 4, textAlign: 'center' }}
                     />
                   </td>
-                  <td className="p-2 border">
+                  <td className="p-2 border text-center">
                     <input
                       type="number"
                       min={0}
-                      defaultValue={item.donGia || ''}
-                      style={{ width: 100, padding: 4, border: '1px solid #e5e7eb', borderRadius: 4 }}
+                      value={getBudgetInputValue(item.id, 'donGia') || 100000}
+                      onChange={(e) => handleBudgetInputChange(item.id, 'donGia', e.target.value)}
+                      style={{ width: '100%', padding: 4, border: '1px solid #e5e7eb', borderRadius: 4, textAlign: 'right' }}
                     />
                   </td>
-                  <td className="p-2 border text-right">{(soLuong !== undefined && donGia !== undefined) ? thanhTien.toLocaleString() : ''}</td>
-                  <td className="p-2 border">
+                  <td className="p-2 border text-right font-medium" style={{ color: '#059669' }}>
+                    {formatCurrency(thanhTien)}
+                  </td>
+                  <td className="p-2 border text-center">
                     <Chip 
-                      label={item.type === 'domestic' ? 'Trong nước' : 'Quốc tế'} 
+                      label={capitalizeWords(item.type === 'domestic' ? 'trong nước' : 'quốc tế')} 
                       size="small" 
                       color={item.type === 'domestic' ? 'primary' : 'secondary'}
                     />
@@ -242,6 +511,17 @@ export default function ProcedurePage() {
             })}
           </tbody>
         </table>
+
+        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={saveBudgetData}
+            sx={{ fontWeight: 600 }}
+          >
+            Lưu dự toán
+          </Button>
+        </Box>
       </Box>
     );
   };
@@ -293,6 +573,7 @@ export default function ProcedurePage() {
 
   const currentStep = steps[activeStep];
 
+  console.log('LOADING', loading);
   if (loading) {
     return (
       <div className="flex h-screen">
@@ -300,7 +581,7 @@ export default function ProcedurePage() {
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
             <CircularProgress size={60} />
             <Typography variant="h6" color="text.secondary">
-              Đang tải dữ liệu thủ tục...
+              Đang tải...
             </Typography>
           </Box>
         </div>
@@ -331,8 +612,8 @@ export default function ProcedurePage() {
               <Link
                 underline="none"
                 color="inherit"
-                href="#"
-                onClick={() => setSelectedItem(null)}
+                component="button"
+                onClick={() => navigate('/')}
               >
                 <FaHome className="inline mr-1" /> Trang chủ
               </Link>
@@ -340,11 +621,33 @@ export default function ProcedurePage() {
               <Link
                 underline="none"
                 color="inherit"
-                href="/procedures"
-                onClick={() => setSelectedItem(null)}
+                component="button"
+                onClick={() => {
+                  setSelectedItem(null);
+                  setProcedureData(null);
+                  navigate('/procedures');
+                }}
               >
                 Tra cứu thủ tục
               </Link>
+
+              {/* Category breadcrumb based on URL type parameter */}
+              {searchParams.get('type') && (
+                <Link
+                  underline="none"
+                  color="inherit"
+                  component="button"
+                  onClick={() => {
+                    setSelectedItem(null);
+                    setProcedureData(null);
+                    const type = searchParams.get('type');
+                    navigate(`/procedures?type=${type}`);
+                  }}
+                >
+                  {searchParams.get('type') === 'trong-nuoc' ? 'Công tác phí trong nước' : 'Công tác phí nước ngoài'}
+                </Link>
+              )}
+
               <Typography sx={{ fontSize: "14px" }} color="#2563eb" fontWeight={600}>
                 {selectedTitle}
               </Typography>
@@ -422,10 +725,97 @@ export default function ProcedurePage() {
               </div>
 
               <div className="w-32%">
-                <ChatBot />
+                <ChatBot 
+                  procedureName={getProcedureSubName()}
+                  currentStep={
+                    activeStep === 0 ? "lập hồ sơ dự toán" :
+                    activeStep === 1 ? "chuẩn bị các giấy tờ kèm theo" :
+                    activeStep === 2 ? "nộp hồ sơ và xét duyệt" :
+                    activeStep === 3 ? "hoàn thành thủ tục" :
+                    "thực hiện thủ tục"
+                  }
+                />
               </div>
             </div>
           </>
+        ) : proceduresList.length > 0 ? (
+          <Box>
+            {/* Breadcrumb for procedures list */}
+            <Breadcrumbs sx={{ fontSize: "14px", mb: 4 }} separator=">">
+              <Link 
+                underline="none" 
+                color="inherit" 
+                component="button"
+                onClick={() => navigate('/')}
+              >
+                <FaHome className="inline mr-1" /> Trang chủ
+              </Link>
+              <Link 
+                underline="none" 
+                color="inherit" 
+                component="button"
+                onClick={() => navigate('/procedures')}
+              >
+                Tra cứu thủ tục
+              </Link>
+              <Typography sx={{ fontSize: "14px" }} color="#2563eb" fontWeight={600}>
+                {searchParams.get('type') === 'trong-nuoc' ? 'Công tác phí trong nước' : 
+                 searchParams.get('type') === 'nuoc-ngoai' ? 'Công tác phí nước ngoài' : 
+                 'Quy trình'}
+              </Typography>
+            </Breadcrumbs>
+
+            {/* Title */}
+            <Typography variant="h4" fontWeight={700} sx={{ mb: 3, color: '#1e40af' }}>
+              {searchParams.get('type') === 'trong-nuoc' ? 'Công tác phí trong nước' : 
+               searchParams.get('type') === 'nuoc-ngoai' ? 'Công tác phí nước ngoài' : 
+               'Quy trình'}
+            </Typography>
+
+            {/* Procedures List */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {proceduresList.map((procedure: any, index: number) => (
+                <Paper 
+                  key={procedure.id}
+                  onClick={() => loadProcedureData(procedure.id)}
+                  sx={{ 
+                    p: 3, 
+                    borderRadius: 2, 
+                    border: '1px solid #e5e7eb',
+                    borderLeft: '4px solid #2669FC',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                      transform: 'translateY(-1px)'
+                    }
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6" fontWeight={600} sx={{ color: '#1e40af' }}>
+                      {index + 1}. {procedure.title || procedure.name}
+                    </Typography>
+                  </Box>
+                  
+                  {procedure.description && (
+                    <Typography variant="body2" sx={{ color: '#6b7280', mb: 2 }}>
+                      {procedure.description}
+                    </Typography>
+                  )}
+
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Chip 
+                      icon={<FaFileAlt />}
+                      label="Xem chi tiết" 
+                      size="small" 
+                      variant="outlined"
+                      sx={{ color: '#2563eb', borderColor: '#2563eb' }}
+                    />
+                  </Box>
+                </Paper>
+              ))}
+            </Box>
+          </Box>
         ) : (
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "50vh" }}>
             <Typography variant="h5" color="text.secondary" gutterBottom>
