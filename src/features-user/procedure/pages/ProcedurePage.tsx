@@ -51,10 +51,10 @@ interface ProcedureData {
   ghichus: GhiChu[];
 }
 
-// API response structure theo cấu trúc thực tế
 interface ProcedureResponse {
   success: boolean;
-  data: ProcedureData;
+  data: ProcedureData | null;
+  error?: string;
 }
 
 // ====== Steps ======
