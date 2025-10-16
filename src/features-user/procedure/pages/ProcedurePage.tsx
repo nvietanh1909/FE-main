@@ -51,10 +51,10 @@ interface ProcedureData {
   ghichus: GhiChu[];
 }
 
-// API response structure theo cấu trúc thực tế
 interface ProcedureResponse {
   success: boolean;
-  data: ProcedureData;
+  data: ProcedureData | null;
+  error?: string;
 }
 
 // ====== Steps ======
@@ -259,26 +259,27 @@ export default function ProcedurePage() {
   };
 
   useEffect(() => {
-    // Check for URL parameters
     const urlParams = new URLSearchParams(location.search);
     const type = urlParams.get('type');
     const procedureId = params.id;
     const itemId = urlParams.get('item');
-    
-    console.log('ProcedurePage useEffect triggered:', { type, procedureId, itemId, pathname: location.pathname, search: location.search });
-    
+  
+    console.log('ProcedurePage useEffect triggered:', { type, procedureId, itemId });
+  
     if (procedureId || itemId) {
-      // Load specific procedure by ID
       const finalProcedureId = procedureId || itemId;
+      resetState();
       loadProcedureData(finalProcedureId);
     } else if (type) {
-      // Load procedures list and filter by type
+      resetState();
       loadProceduresList(type);
     } else {
-      // Reset if no parameters
+
       resetState();
     }
   }, [location.search, params.id]);
+  
+  
 
   // Debug logging để theo dõi state changes
   useEffect(() => {
