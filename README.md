@@ -9,7 +9,7 @@ https://nodejs.org/en/download
 
 Cài đặt các thư viện cần thiết:
 ```bash
-npm install
+npm install     
 ```
 
 ### 1.2. Chạy dự án ở môi trường dev

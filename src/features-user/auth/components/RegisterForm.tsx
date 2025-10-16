@@ -46,7 +46,7 @@ export default function RegisterForm() {
             const fullName = `${data.lastName} ${data.middleName} ${data.firstName}`.trim();
 
             const payload = {
-                name: fullName,
+                fullname: fullName,
                 email: data.email,
                 password: data.password,
                 organization: data.organization,
@@ -86,7 +86,7 @@ export default function RegisterForm() {
 
     function checkPasswordStrength(password: string) {
         // Điều kiện >= 8 ký tự, 1 chữ hoa, 1 số, 1 ký tự đặc biệt
-        let score = 0;
+        let score = 0; 
         if (password.length >= 8) score++;
         if (/[A-Z]/.test(password)) score++;
         if (/[0-9]/.test(password)) score++;
