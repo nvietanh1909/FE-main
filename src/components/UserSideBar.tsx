@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchProcedures } from '@/features-user/procedure/services/procedureService.ts';
 import { FaCog, FaComments, FaAngleDoubleLeft, FaAngleDoubleRight, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { MdOutlineContentPasteSearch, MdDashboard } from "react-icons/md";
+import { RiRobot2Line } from "react-icons/ri";
 import { Link, useLocation } from 'react-router-dom';
 
 // const menu = [
@@ -112,6 +113,11 @@ export default function UserSideBar() {
             to: '/procedures?category=professional'
           }
         ]
+      },
+      {
+        label: 'UET Assistant',
+        icon: <RiRobot2Line />,
+        to: '/messages',
       },
       {
         label: 'Tin nhắn',

@@ -397,11 +397,10 @@ export default function ProcedurePage() {
         <table className="w-full border border-gray-300" style={{ tableLayout: 'fixed' }}>
           <colgroup>
             <col style={{ width: '8%' }} />
-            <col style={{ width: '32%' }} />
-            <col style={{ width: '12%' }} />
-            <col style={{ width: '18%' }} />
-            <col style={{ width: '18%' }} />
-            <col style={{ width: '12%' }} />
+            <col style={{ width: '44%' }} />
+            <col style={{ width: '16%' }} />
+            <col style={{ width: '16%' }} />
+            <col style={{ width: '16%' }} />
           </colgroup>
           <thead className="bg-blue-600 text-white">
             <tr>
@@ -410,7 +409,6 @@ export default function ProcedurePage() {
               <th className="p-2 border text-center">Số lượng</th>
               <th className="p-2 border text-center">Đơn giá/Định mức</th>
               <th className="p-2 border text-center">Thành tiền</th>
-              <th className="p-2 border text-center">Ghi chú</th>
             </tr>
           </thead>
           <tbody>
@@ -421,7 +419,7 @@ export default function ProcedurePage() {
                   <React.Fragment key={`${item.id}-${idx}`}>
                     <tr>
                       <td className="p-2 border text-center">{idx + 1}</td>
-                      <td className="p-2 border font-medium" style={{ wordWrap: 'break-word' }} colSpan={5}>
+                      <td className="p-2 border font-medium" style={{ wordWrap: 'break-word' }} colSpan={4}>
                         {capitalizeWords(item.name)}
                       </td>
                     </tr>
@@ -453,13 +451,6 @@ export default function ProcedurePage() {
                           </td>
                           <td className="p-2 border text-right font-medium" style={{ color: '#059669' }}>
                             {formatCurrency(thanhTien)}
-                          </td>
-                          <td className="p-2 border text-center">
-                            <Chip 
-                              label={capitalizeWords(child.type === 'domestic' ? 'trong nước' : 'quốc tế')} 
-                              size="small" 
-                              color={child.type === 'domestic' ? 'primary' : 'secondary'}
-                            />
                           </td>
                         </tr>
                       );
@@ -500,13 +491,6 @@ export default function ProcedurePage() {
                   <td className="p-2 border text-right font-medium" style={{ color: '#059669' }}>
                     {formatCurrency(thanhTien)}
                   </td>
-                  <td className="p-2 border text-center">
-                    <Chip 
-                      label={capitalizeWords(item.type === 'domestic' ? 'trong nước' : 'quốc tế')} 
-                      size="small" 
-                      color={item.type === 'domestic' ? 'primary' : 'secondary'}
-                    />
-                  </td>
                 </tr>
               );
             })}
@@ -537,7 +521,7 @@ export default function ProcedurePage() {
           {procedureData.hosochungtus.map((doc, idx) => (
             <Chip
               key={`${doc.id}-${idx}`}
-              label={doc.name}
+              label={capitalizeWords(doc.name)}
               variant="outlined"
               color="primary"
               size="small"

@@ -7,10 +7,8 @@ export const capitalizeFirstLetter = (str: string): string => {
 
 export const capitalizeWords = (str: string): string => {
   if (!str) return '';
-  return str
-    .split(' ')
-    .map(word => capitalizeFirstLetter(word))
-    .join(' ');
+  // Chỉ viết hoa chữ cái đầu tiên của câu, phần còn lại giữ nguyên
+  return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
 export const formatCurrency = (amount: number): string => {
