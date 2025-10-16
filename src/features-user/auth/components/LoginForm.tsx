@@ -11,6 +11,7 @@ import Switch from "@mui/material/Switch";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { SwitchIOS } from "@/components/switch/SwitchIOS.tsx";
 import { useNProgress } from "@/hooks/useNProgress.ts";
+import { setToken, setUser } from "@/services/AuthService.ts";
 
 
 type LoginFormInput = {
@@ -59,11 +60,14 @@ export default function LoginForm() {
             if (result.success) {
                 setIsloginSucess(true);
                 setUserName(result.data.user.email);
+                
+                // Lưu authentication status
                 sessionStorage.setItem('islogined', 'true');
-                sessionStorage.setItem('token', result.data.token);
-                localStorage.setItem('token', result.data.token);
-                sessionStorage.setItem('userName', result.data.user.name);
-                sessionStorage.setItem('userEmail', result.data.user.email);
+                
+                // Sử dụng AuthService để lưu token và user data từ API response
+                setToken(result.data.token);
+                setUser(result.data.user);
+                
                 navigate('/', { replace: true });
             }
         } catch (error) {
