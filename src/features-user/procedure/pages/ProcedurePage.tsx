@@ -623,20 +623,6 @@ export default function ProcedurePage() {
                     {currentStep.label}: {currentStep.sublabel}
                   </Typography>
 
-                  <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-                    <Chip
-                      icon={<FaClock />}
-                      label={`Thời gian: 1-3 ngày làm việc`}
-                      variant="outlined"
-                      size="small"
-                    />
-                    <Chip
-                      icon={<FaFileAlt />}
-                      label={`${procedureData.hosochungtus.length} tài liệu`}
-                      variant="outlined"
-                      size="small"
-                    />
-                  </Box>
                   <Divider sx={{ mb: 2 }} />
 
                   {/* Procedure Description: chỉ hiện ở bước 1, 2 */}
