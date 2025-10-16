@@ -34,7 +34,7 @@ export default function Welcome({ name, notificationCount }: WelcomeProps) {
                 color: '#1E40B7',
                 fontWeight: '600',
                 fontSize: '0.98rem',
-            }}>Xin chào {user.name}</AlertTitle>
+            }}>Xin chào quý thầy cô!</AlertTitle>
             <div className="text-[0.8rem] text-[#1E40B7]">
                 Hôm nay là ngày {user.date}. Bạn có <b>{notificationCount}</b> thông báo mới cần xem xét.
             </div>

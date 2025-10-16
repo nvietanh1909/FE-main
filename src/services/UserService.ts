@@ -10,6 +10,7 @@ export interface UserProfile {
     department: string;
     position: string;
     employee_id: string;
+    organization: string;
     created_at?: string;
     updated_at?: string;
 }
@@ -19,6 +20,7 @@ export interface UpdateUserRequest {
     department?: string;
     position?: string;
     employee_id?: string;
+    organization?: string;
 }
 
 export interface UserResponse {
@@ -41,7 +43,7 @@ export async function fetchCurrentUser(): Promise<UserResponse> {
             };
         }
 
-        const response = await fetch(`${BASE_URL}/auth/me`, {
+        const response = await fetch(`${BASE_URL}/me`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -88,7 +90,7 @@ export async function updateUserProfile(updates: UpdateUserRequest): Promise<Use
             };
         }
 
-        const response = await fetch(`${BASE_URL}/auth/me`, {
+        const response = await fetch(`${BASE_URL}/me`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -144,4 +146,19 @@ export async function refreshUserData(): Promise<UserProfile | null> {
     }
     
     return null;
+}
+
+/**
+ * Load user data khi app khởi động (nếu có token)
+ */
+export async function initializeUserData(): Promise<void> {
+    const token = getToken();
+    if (token) {
+        try {
+            await refreshUserData();
+            console.log('✅ User data initialized successfully');
+        } catch (error) {
+            console.error('❌ Failed to initialize user data:', error);
+        }
+    }
 }

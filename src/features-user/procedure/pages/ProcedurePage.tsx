@@ -86,19 +86,13 @@ export default function ProcedurePage() {
         </Typography>
         <table className="w-full border border-gray-300" style={{ tableLayout: 'fixed' }}>
           <colgroup>
-            <col style={{ width: '8%' }} />
-            <col style={{ width: '45%' }} />
-            <col style={{ width: '12%' }} />
-            <col style={{ width: '20%' }} />
             <col style={{ width: '15%' }} />
+            <col style={{ width: '85%' }} />
           </colgroup>
           <thead className="bg-blue-600 text-white">
             <tr>
               <th className="p-2 border text-center">STT</th>
               <th className="p-2 border text-center">Hồ sơ</th>
-              <th className="p-2 border text-center">Số lượng</th>
-              <th className="p-2 border text-center">Mẫu</th>
-              <th className="p-2 border text-center">Chú ý</th>
             </tr>
           </thead>
           <tbody>
@@ -107,32 +101,6 @@ export default function ProcedurePage() {
                 <td className="p-2 border text-center">{idx + 1}</td>
                 <td className="p-2 border" style={{ wordWrap: 'break-word' }}>
                   {capitalizeWords(doc.name)}
-                </td>
-                <td className="p-2 border text-center">
-                  <input 
-                    type="number" 
-                    min={0} 
-                    defaultValue={1}
-                    style={{ 
-                      width: '100%', 
-                      padding: 4, 
-                      border: '1px solid #e5e7eb', 
-                      borderRadius: 4,
-                      textAlign: 'center'
-                    }} 
-                  />
-                </td>
-                <td className="p-2 border text-center">
-                  {doc.path ? (
-                    <a href={doc.path} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800">
-                      Tải mẫu
-                    </a>
-                  ) : (
-                    <span className="text-gray-400">Không có</span>
-                  )}
-                </td>
-                <td className="p-2 border text-center">
-                  <span className="text-xs text-gray-600">01 bản</span>
                 </td>
               </tr>
             ))}
@@ -419,7 +387,7 @@ export default function ProcedurePage() {
                   <React.Fragment key={`${item.id}-${idx}`}>
                     <tr>
                       <td className="p-2 border text-center">{idx + 1}</td>
-                      <td className="p-2 border font-medium" style={{ wordWrap: 'break-word' }} colSpan={4}>
+                      <td className="p-2 border" style={{ wordWrap: 'break-word' }} colSpan={4}>
                         {capitalizeWords(item.name)}
                       </td>
                     </tr>
@@ -449,7 +417,7 @@ export default function ProcedurePage() {
                               style={{ width: '100%', padding: 4, border: '1px solid #e5e7eb', borderRadius: 4, textAlign: 'right' }}
                             />
                           </td>
-                          <td className="p-2 border text-right font-medium" style={{ color: '#059669' }}>
+                          <td className="p-2 border text-right" style={{ color: '#059669' }}>
                             {formatCurrency(thanhTien)}
                           </td>
                         </tr>
@@ -467,7 +435,7 @@ export default function ProcedurePage() {
               return (
                 <tr key={`${item.id}-${idx}`}>
                   <td className="p-2 border text-center">{idx + 1}</td>
-                  <td className="p-2 border font-medium" style={{ wordWrap: 'break-word' }}>
+                  <td className="p-2 border" style={{ wordWrap: 'break-word' }}>
                     {capitalizeWords(item.name)}
                   </td>
                   <td className="p-2 border text-center">
@@ -488,7 +456,7 @@ export default function ProcedurePage() {
                       style={{ width: '100%', padding: 4, border: '1px solid #e5e7eb', borderRadius: 4, textAlign: 'right' }}
                     />
                   </td>
-                  <td className="p-2 border text-right font-medium" style={{ color: '#059669' }}>
+                  <td className="p-2 border text-right" style={{ color: '#059669' }}>
                     {formatCurrency(thanhTien)}
                   </td>
                 </tr>

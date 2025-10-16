@@ -117,7 +117,7 @@ export default function UserSideBar() {
       {
         label: 'UET Assistant',
         icon: <RiRobot2Line />,
-        to: '/messages',
+        to: '/assistant',
       },
       {
         label: 'Tin nhắn',

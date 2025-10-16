@@ -10,6 +10,7 @@ import PublicRoute from '@/routes/PublicRoute.tsx'
 import NotFoundPage from '@/routes/NotFoundRoute.tsx'
 import ProcedurePage from '@/features-user/procedure/pages/ProcedurePage.tsx'
 import MessagePage from '@/features-user/message/pages/MessagePage.tsx'
+import AssistantPage from '@/features-user/assistant/pages/AssistantPage.tsx'
 import SettingPage from '@/features-user/setting/pages/SettingPage.tsx'
 import AdminLoginPage from '@/features-admin/auth/pages/AdminLoginPage.tsx';
 import AdminDashboardPage from '@/features-admin/dashboard/pages/AdminDashboardPage.tsx';
@@ -21,12 +22,13 @@ import AdminSettingsPage from '@/features-admin/settings/pages/AdminSettingsPage
 import AdminMessagePage from '@/features-admin/messages/pages/AdminMessagePage.tsx';
 import AdminProcedureWrapper from './features-admin/procedure/pages/AdminProcedureWrapper.tsx'
 import AdminDocumentPage from './features-admin/document/pages/AdminDocumentPage.tsx';
+import { UserProvider } from '@/contexts/UserContext';
 
 function App() {
   return (
-    
-    <Router>
-      <Routes>
+    <UserProvider>
+      <Router>
+        <Routes>
 
         {/* Public routes: Login, Register */}
         <Route path="/login" element={
@@ -69,6 +71,7 @@ function App() {
         }>
           <Route index element={<DashboardPage />} />
           <Route path="procedures" element={<ProcedurePage />} />
+          <Route path="assistant" element={<AssistantPage />} />
           <Route path="messages" element={<MessagePage />} />
           <Route path="settings" element={<SettingPage />} />
           <Route path="procedures/:id" element={<ProcedurePage />} />
@@ -79,8 +82,9 @@ function App() {
         {/* Redirect to login if routes are not exist */}
         <Route path="*" element={<Navigate to="/login" replace />} />
 
-      </Routes>
-    </Router>
+        </Routes>
+      </Router>
+    </UserProvider>
   )
 }
 

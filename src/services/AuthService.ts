@@ -35,7 +35,8 @@ export function setUser(userData: any) {
         role: userData.role || 'user',
         department: userData.department || '',
         position: userData.position || '',
-        employee_id: userData.employee_id || ''
+        employee_id: userData.employee_id || '',
+        organization: userData.organization || ''
     };
     
     sessionStorage.setItem('user', JSON.stringify(user));
@@ -69,6 +70,7 @@ export interface UserData {
     department: string;
     position: string;
     employee_id: string;
+    organization: string;
 }
 
 export function getCurrentUser(): UserData | null {

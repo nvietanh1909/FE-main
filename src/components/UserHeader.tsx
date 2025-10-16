@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import UET from '@/assets/images/UET.svg';
 import { Link, useNavigate } from "react-router-dom";
-import { getUser, logout } from "@/services/AuthService.ts";
+import { logout } from "@/services/AuthService.ts";
+import { useUser } from "@/hooks/useUser";
 import Avatar from "@mui/material/Avatar";
 import { deepPurple, blue } from "@mui/material/colors";
 import { FaChevronDown } from 'react-icons/fa';
@@ -10,11 +11,7 @@ import { FiLogOut } from "react-icons/fi";
 
 export default function Header() {
     const navigate = useNavigate();
-    const user = {
-        name: getUser()?.name,
-        role: getUser()?.role || "Trưởng phòng",
-        username: getUser()?.username || "user"
-    };
+    const { user, loading } = useUser();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -63,7 +60,9 @@ export default function Header() {
                                     className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 px-3 py-2 rounded-lg transition-colors"
                                     onClick={toggleDropdown}
                                 >
-                                    <Avatar sx={{bgcolor: blue[500], fontSize: '1.2rem', textTransform: 'uppercase' }}>{user?.name?.charAt(0)}</Avatar>
+                                    <Avatar sx={{bgcolor: blue[500], fontSize: '1.2rem', textTransform: 'uppercase' }}>
+                                        {loading ? '...' : (user?.name?.charAt(0) || 'U')}
+                                    </Avatar>
                                     <FaChevronDown className={`text-[0.8rem] text-gray-600 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                                 </div>
                                 {/* Dropdown Menu */}
@@ -72,13 +71,26 @@ export default function Header() {
                                         {/* User Info Section */}
                                         <div className="px-4 py-3 border-b border-gray-100 pb-6 border-b-solid">
                                             <div className="flex items-center gap-3 ">
-                                                <Avatar sx={{width: '3rem', height: '3rem', bgcolor: blue[500], fontSize: '1.4rem', textTransform: 'uppercase' }}>{user?.name?.charAt(0)}</Avatar>
+                                                <Avatar sx={{width: '3rem', height: '3rem', bgcolor: blue[500], fontSize: '1.4rem', textTransform: 'uppercase' }}>
+                                                    {loading ? '...' : (user?.name?.charAt(0) || 'U')}
+                                                </Avatar>
                                                 <div>
-                                                    <p className="text-[1rem] text-gray-900 m-0">{user?.name || 'User'}</p>
-                                                    <div className="flex items-center gap-2">
-                                                        <p className="text-gray-500 m-0 text-[0.8rem]">@{user?.username || 'user'}</p>
-                                                        <p className=" m-0 text-[0.8rem] px-2 bg-blue-200 text-blue-800 rounded-full">{user?.role || 'user'}</p>
+                                                    <p className="text-[1rem] text-gray-900 m-0">
+                                                        {loading ? 'Đang tải...' : (user?.name || 'User')}
+                                                    </p>
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <p className="text-gray-500 m-0 text-[0.8rem] flex-shrink-0 max-w-[140px] truncate">
+                                                            {user?.email || 'email@example.com'}
+                                                        </p>
+                                                        <p className="m-0 text-[0.8rem] px-2 bg-blue-200 text-blue-800 rounded-full flex-shrink-0">
+                                                            {user?.role || 'user'}
+                                                        </p>
                                                     </div>
+                                                    {user?.department && (
+                                                        <p className="text-gray-400 m-0 text-[0.75rem] mt-1">
+                                                            {user.department} - {user.position || 'N/A'}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
