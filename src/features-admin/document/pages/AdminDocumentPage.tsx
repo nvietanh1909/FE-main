@@ -470,7 +470,16 @@ export default function AdminDocumentPage() {
                 </div>
 
                 <div className="w-32%">
-                  <ChatBot />
+                  <ChatBot 
+                    procedureName={selectedTitle}
+                    currentStep={
+                      activeStep === 0 ? "lập hồ sơ dự toán" :
+                      activeStep === 1 ? "chuẩn bị các giấy tờ kèm theo" :
+                      activeStep === 2 ? "nộp hồ sơ và xét duyệt" :
+                      activeStep === 3 ? "hoàn thành thủ tục" :
+                      "quản lý quy trình"
+                    }
+                  />
                 </div>
             </div>
 
