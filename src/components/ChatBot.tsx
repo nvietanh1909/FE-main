@@ -616,7 +616,7 @@ export default function ChatBot({ procedureName, currentStep }: ChatBotProps = {
           </div>
         ))}
 
-        {/* {isTyping && (
+        {isTyping && (
           <div
             style={{
               display: "flex",
@@ -673,7 +673,7 @@ export default function ChatBot({ procedureName, currentStep }: ChatBotProps = {
               </div>
             </div>
           </div>
-        )} */}
+        )}
 
         <div ref={messagesEndRef} />
       </div>

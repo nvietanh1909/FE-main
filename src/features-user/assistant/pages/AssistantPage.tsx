@@ -3,6 +3,7 @@ import { Box, Paper, Typography, TextField, IconButton, Avatar, CircularProgress
 import { Send as SendIcon, Person as UserIcon } from '@mui/icons-material';
 import { RiRobot2Line } from 'react-icons/ri';
 import ReactMarkdown from 'react-markdown';
+import '@/assets/styles/chatbot.css';
 
 // Copy RAGService class from ChatBot.tsx
 class RAGService { 
@@ -410,7 +411,7 @@ const AssistantPage: React.FC = () => {
           ))}
           
           {isTyping && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1.5, mb: 3 }}>
               <Avatar sx={{ 
                 bgcolor: '#3b82f6', 
                 width: 36, 
@@ -421,13 +422,16 @@ const AssistantPage: React.FC = () => {
               <Paper elevation={1} sx={{ 
                 p: 2.5, 
                 borderRadius: '16px 16px 16px 4px',
-                border: '1px solid #e5e7eb'
+                border: '1px solid #e5e7eb',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '20px'
               }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
-                    Đang trả lời
-                  </Typography>
-                  <CircularProgress size={12} sx={{ color: '#3b82f6' }} />
+                <Box className="typing-indicator" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Box className="typing-dot"></Box>
+                  <Box className="typing-dot"></Box>
+                  <Box className="typing-dot"></Box>
                 </Box>
               </Paper>
             </Box>

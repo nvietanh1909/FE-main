@@ -49,7 +49,7 @@ export default function Header() {
                         <img src={UET} alt="UET Logo" className="h-8 w-auto" />
                     </Link>
                     {/* Nút chọn năm học ở giữa */}
-                    <div className="flex items-center gap-12">
+                    <div className="flex items-center gap-4">
                         <button className="flex items-center gap-1 border !font-semibold border-blue-400 text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.8 rounded-md text-sm font-medium transition-colors">
                             Năm học 2025-2026
                         </button>

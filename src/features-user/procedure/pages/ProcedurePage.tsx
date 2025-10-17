@@ -581,7 +581,7 @@ export default function ProcedurePage() {
                   navigate('/procedures');
                 }}
               >
-                Tra cứu thủ tục
+                Danh mục quy trình
               </Link>
 
               {/* Category breadcrumb based on URL type parameter */}
@@ -695,7 +695,7 @@ export default function ProcedurePage() {
                 component="button"
                 onClick={() => navigate('/procedures')}
               >
-                Tra cứu thủ tục
+                Danh mục quy trình
               </Link>
               <Typography sx={{ fontSize: "14px" }} color="#2563eb" fontWeight={600}>
                 {searchParams.get('type') === 'trong-nuoc' ? 'Công tác phí trong nước' : 
@@ -761,7 +761,7 @@ export default function ProcedurePage() {
               Chọn một quy trình từ menu bên trái để xem chi tiết
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Sử dụng menu "Tra cứu thủ tục" để chọn quy trình bạn muốn tìm hiểu
+              Sử dụng menu "Danh mục quy trình" để chọn quy trình bạn muốn tìm hiểu
             </Typography>
           </Box>
         )}
