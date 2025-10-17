@@ -61,7 +61,7 @@ export default function Header() {
                                     onClick={toggleDropdown}
                                 >
                                     <Avatar sx={{bgcolor: blue[500], fontSize: '1.2rem', textTransform: 'uppercase' }}>
-                                        {loading ? '...' : (user?.name?.charAt(0) || 'U')}
+                                        {loading ? '...' : (user?.fullname?.charAt(0) || 'U')}
                                     </Avatar>
                                     <FaChevronDown className={`text-[0.8rem] text-gray-600 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                                 </div>
@@ -72,11 +72,11 @@ export default function Header() {
                                         <div className="px-4 py-3 border-b border-gray-100 pb-6 border-b-solid">
                                             <div className="flex items-center gap-3 ">
                                                 <Avatar sx={{width: '3rem', height: '3rem', bgcolor: blue[500], fontSize: '1.4rem', textTransform: 'uppercase' }}>
-                                                    {loading ? '...' : (user?.name?.charAt(0) || 'U')}
+                                                    {loading ? '...' : (user?.fullname?.charAt(0) || 'U')}
                                                 </Avatar>
                                                 <div>
                                                     <p className="text-[1rem] text-gray-900 m-0">
-                                                        {loading ? 'Đang tải...' : (user?.name || 'User')}
+                                                        {loading ? 'Đang tải...' : (user?.fullname || 'User')}
                                                     </p>
                                                     <div className="flex items-center gap-2 flex-wrap">
                                                         <p className="text-gray-500 m-0 text-[0.8rem] flex-shrink-0 max-w-[140px] truncate">

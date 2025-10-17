@@ -43,7 +43,7 @@ export default function RegisterForm() {
 
         try {
             // Ghép họ, tên đệm, tên thành một trường 'name' duy nhất
-            const fullName = `${data.lastName} ${data.middleName} ${data.firstName}`.trim();
+            const fullName = `${data.firstName} ${data.lastName} ${data.middleName}`.trim();
 
             const payload = {
                 fullname: fullName,

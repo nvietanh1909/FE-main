@@ -33,7 +33,7 @@ export const useUser = (): UseUserReturn => {
       if (result.success && result.data) {
         setUser(result.data); // Lưu vào storage
         setUserState(result.data); // Update state
-        console.log('✅ User data refreshed:', result.data.name);
+        console.log('✅ User data refreshed:', result.data.fullname);
       } else {
         setError(result.error || 'Failed to fetch user data');
         console.error('❌ Failed to fetch user:', result.error);
