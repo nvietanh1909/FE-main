@@ -30,7 +30,7 @@ export function setToken(token: string) {
 export function setUser(userData: any) {
     const user = {
         id: userData.id,
-        name: userData.name,
+        name: userData.fullname || userData.name,  // Use fullname from API, fallback to name
         email: userData.email,
         role: userData.role || 'user',
         department: userData.department || '',
@@ -43,7 +43,7 @@ export function setUser(userData: any) {
     localStorage.setItem('user', JSON.stringify(user));
     
     // Giữ lại các field riêng lẻ để tương thích ngược
-    sessionStorage.setItem('userName', userData.name || '');
+    sessionStorage.setItem('userName', userData.fullname || userData.name || '');
     sessionStorage.setItem('userEmail', userData.email || '');
 }
 
