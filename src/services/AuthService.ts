@@ -30,7 +30,7 @@ export function setToken(token: string) {
 export function setUser(userData: any) {
     const user = {
         id: userData.id,
-        name: userData.fullname || userData.name,  // Use fullname from API, fallback to name
+        fullname: userData.fullname || userData.name,  // Use fullname from API, fallback to name
         email: userData.email,
         role: userData.role || 'user',
         department: userData.department || '',
@@ -54,7 +54,7 @@ export function getUser() {
 
 export function getUserName() {
     const user = getUser();
-    return user?.name || sessionStorage.getItem('userName') || '';
+    return user?.fullname || sessionStorage.getItem('userName') || '';
 }
 
 export function getUserEmail() {
@@ -64,7 +64,7 @@ export function getUserEmail() {
 
 export interface UserData {
     id: number;
-    name: string;
+    fullname: string;
     email: string;
     role: string;
     department: string;
