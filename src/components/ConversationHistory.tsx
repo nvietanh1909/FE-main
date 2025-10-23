@@ -223,67 +223,74 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
                         </Box>
                       ) : (
                         <>
-                          <ListItemText
-                            primary={
-                              <Typography
-                                variant="body2"
-                                fontWeight={selectedConversationId === conversation.id ? 600 : 400}
-                                sx={{
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                  whiteSpace: 'nowrap',
-                                  lineHeight: 1.3
-                                }}
-                              >
-                                {conversation.title || `Cuộc trò chuyện ${conversation.id}`}
-                              </Typography>
-                            }
-                            secondary={
-                              <Typography variant="caption" color="text.secondary">
-                                {conversation.created_at ? `Tạo: ${formatDate(conversation.created_at)} • ` : ''}{formatDate(conversation.updated_at)}
-                              </Typography>
-                            }
-                            sx={{ m: 0 }}
-                          />
-                          <Box sx={{ display: 'flex', gap: 0.5 }}>
-                            <Tooltip title="Sửa tiêu đề cuộc trò chuyện">
-                              <IconButton
-                                size="small"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleEditStart(conversation);
-                                }}
-                                sx={{ 
-                                  opacity: 0,
-                                  transition: 'opacity 0.2s',
-                                  '.MuiListItem-root:hover &': {
-                                    opacity: 1
-                                  },
-                                  p: 0.5
-                                }}
-                              >
-                                <EditIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Xóa cuộc hội thoại">
-                              <IconButton
-                                size="small"
-                                onClick={(e) => handleDeleteConversation(conversation.id, e)}
-                                sx={{ 
-                                  opacity: 0,
-                                  transition: 'opacity 0.2s',
-                                  '.MuiListItem-root:hover &': {
-                                    opacity: 1
-                                  },
-                                  p: 0.5,
-                                  '&:hover': {
-                                    color: '#dc2626'
-                                  }
-                                }}
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
+                            <ListItemText
+                              primary={
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <Typography
+                                    variant="body2"
+                                    fontWeight={selectedConversationId === conversation.id ? 600 : 400}
+                                    sx={{
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      whiteSpace: 'nowrap',
+                                      lineHeight: 1.3,
+                                      flex: 1
+                                    }}
+                                  >
+                                    {conversation.title || `Cuộc trò chuyện ${conversation.id}`}
+                                  </Typography>
+                                  <Box sx={{ 
+                                    display: 'flex', 
+                                    gap: 0.5,
+                                    opacity: 0,
+                                    transition: 'opacity 0.2s',
+                                    '.MuiListItem-root:hover &': {
+                                      opacity: 1
+                                    }
+                                  }}>
+                                    <Tooltip title="Sửa tiêu đề cuộc trò chuyện">
+                                      <IconButton
+                                        size="small"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleEditStart(conversation);
+                                        }}
+                                        sx={{ 
+                                          p: 0.3,
+                                          '&:hover': {
+                                            bgcolor: 'rgba(0,0,0,0.04)'
+                                          }
+                                        }}
+                                      >
+                                        <EditIcon fontSize="small" />
+                                      </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Xóa cuộc hội thoại">
+                                      <IconButton
+                                        size="small"
+                                        onClick={(e) => handleDeleteConversation(conversation.id, e)}
+                                        sx={{ 
+                                          p: 0.3,
+                                          '&:hover': {
+                                            bgcolor: 'rgba(220,38,38,0.1)',
+                                            color: '#dc2626'
+                                          }
+                                        }}
+                                      >
+                                        <DeleteIcon fontSize="small" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  </Box>
+                                </Box>
+                              }
+                              secondary={
+                                <Typography variant="caption" color="text.secondary">
+                                  {conversation.created_at ? `Tạo: ${formatDate(conversation.created_at)} • ` : ''}{formatDate(conversation.updated_at)}
+                                </Typography>
+                              }
+                              sx={{ m: 0 }}
+                            />
                           </Box>
                         </>
                       )}
